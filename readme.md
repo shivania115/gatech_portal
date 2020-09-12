@@ -1,4 +1,8 @@
-# Stitch Example - Todo App
+# GaTech Diabetes Portal
+
+This project is built upon the following Stitch Example - Todo App, with GA map added to the page.
+
+Stitch Example - Todo App
 
 This sample app is intended to be used by following the 
 [Todo tutorial](https://docs.mongodb.com/stitch/tutorials/todo-overview/) in the 
