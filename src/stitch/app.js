@@ -1,7 +1,7 @@
 import { Stitch } from "mongodb-stitch-browser-sdk";
 
 // TODO: Add your Stitch app's App ID
-const APP_ID = "<YOUR APP ID>";
+const APP_ID = "test-owzgf";
 
 // TODO: Initialize the app client
 const app = Stitch.hasAppClient(APP_ID)
