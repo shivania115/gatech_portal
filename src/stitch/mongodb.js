@@ -8,6 +8,6 @@ const mongoClient = app.getServiceClient(
 );
 
 // TODO: Instantiate a collection handle for todo.items
-const items = mongoClient.db("todo").collection("items");
+const gatech = mongoClient.db("healthequity").collection("gatech");
 
-export { items };
+export { gatech };

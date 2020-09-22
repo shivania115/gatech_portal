@@ -1,5 +1,5 @@
 // React
-import React, {useEffect, useState, } from "react";
+import React, {useEffect, useState, setState} from "react";
 import ErrorBoundary from "react-error-boundary";
 import GAMap from "./GAMap";
 import {GADMProvider, useGADM} from './GADMProvider';
@@ -9,8 +9,64 @@ import {
   Table,
   Header,
   Divider,
-  List,
+  List
 } from 'semantic-ui-react'
+import {gatech} from '../stitch/mongodb';
+
+
+
+function DetTable(props){
+  const subgroup = props.subgroup;
+  const categories = props.categories;
+  const [count,setCount] = useState([]);
+  const {selectedVariable, 
+    selectedCounty, 
+    actions: {handlePageStateChange}} = useGADM();
+
+  const GetValue = async()=> {
+    var countArray = [];
+    const query = {"subgroup":subgroup, "county":selectedCounty.NAME+" County"};
+    const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
+    var obj;
+    for (obj in prom){
+      countArray.push(prom[obj].value);
+    }
+    setCount(countArray);
+  };
+
+  const GetAVG = async()=> {
+    var avgArray = [];
+    const query = {"subgroup":subgroup};
+    const prom2 = await gatech.find(query,{projection:{"":1,"value":1}}).toArray();
+    console.log("prom2", prom2);
+    var obj;
+    for (obj in prom2){
+      avgArray.push(prom2[obj].value);
+    }
+    setCount(avgArray);
+  };
+
+  useEffect(()=>{
+    GetValue();
+  }, [selectedVariable, selectedCounty, subgroup]);
+
+  
+
+
+  const zipped = categories.map((category,index) =>{
+    //console.log(count[index]);
+    return(
+    <Table.Row key={category.toString()}>
+      <Table.Cell>{category}</Table.Cell>
+      <Table.Cell>{count[index]}</Table.Cell>    
+      <Table.Cell>..</Table.Cell>            
+    </Table.Row>);
+  });
+  return (
+    <Table.Body>{zipped}</Table.Body>
+  );
+}
+
 
 function DataPanel() {
 
@@ -18,9 +74,38 @@ function DataPanel() {
     selectedCounty, 
     actions: {handlePageStateChange}} = useGADM();
 
-  useEffect(()=>{
-    console.log('DataPanel ' + JSON.stringify(selectedCounty));
-  }, [selectedVariable, selectedCounty]);
+  const [count,setCount] = useState([]);
+
+  const DemographicComposition = ["65 years or older",
+                                  "African American",
+                                  "Asian",
+                                  "Foreign born",
+                                  "Hispanic",
+                                  "Median age",
+                                  "Total Population",
+                                  "Women"];
+  const CardioDiseaseMorbidity = ["CHD Prevalence",
+                                  "Diabetes Prevalence",
+                                  "Hypertension Prevalence",
+                                  "Newly diagnosed diabetes",
+                                  "Obesity Prevalence"];
+  const ClinicalEvents = [];
+  const LifestyleRelatedRiskFactors = ["Alcohol Consumption",
+                                        "Physical Inactivity",
+                                        "Sleep",
+                                        "Smoking"];
+  const HealthCare = ["% Diabetes in Medicaid Population",
+                      "Cardiologists",
+                      "Endocrinologists",
+                      "Primary Care Doctors",
+                      "Uninsured"];
+  const SocioeconomicFactors = ["Graduates High School in 4 Years",
+                                "In Poverty",
+                                "Income Inequality",
+                                "Median Income (2015)",
+                                "Unemployed"];
+  
+
 
   return (
     <Grid>
@@ -47,13 +132,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              <Table.Row> 
-                <Table.Cell>Example</Table.Cell>
-                <Table.Cell>use _.map()</Table.Cell>
-                <Table.Cell>..</Table.Cell>                            
-              </Table.Row>
-            </Table.Body>
+            <DetTable subgroup={"Demographic Composition"} categories={DemographicComposition} />
           </Table>
         </Grid.Column>
         <Grid.Column textAlign="left">
@@ -68,13 +147,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              <Table.Row> 
-                <Table.Cell>Example</Table.Cell>
-                <Table.Cell>use _.map()</Table.Cell>
-                <Table.Cell>..</Table.Cell>                            
-              </Table.Row>
-            </Table.Body>
+              <DetTable subgroup="Cardiometabolic disease morbidity" categories={CardioDiseaseMorbidity} />
           </Table>
         </Grid.Column>
       </Grid.Row>
@@ -91,13 +164,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              <Table.Row> 
-                <Table.Cell>Example</Table.Cell>
-                <Table.Cell>use _.map()</Table.Cell>
-                <Table.Cell>..</Table.Cell>                            
-              </Table.Row>
-            </Table.Body>
+              <DetTable subgroup="Clinical Events" categories={ClinicalEvents} />
           </Table>
         </Grid.Column>
         <Grid.Column textAlign="left">
@@ -112,13 +179,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              <Table.Row> 
-                <Table.Cell>Example</Table.Cell>
-                <Table.Cell>use _.map()</Table.Cell>
-                <Table.Cell>..</Table.Cell>                            
-              </Table.Row>
-            </Table.Body>
+            <DetTable subgroup="Lifestyle Related Risk Factors" categories={LifestyleRelatedRiskFactors} />
           </Table>
         </Grid.Column>
       </Grid.Row>
@@ -135,13 +196,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              <Table.Row> 
-                <Table.Cell>Example</Table.Cell>
-                <Table.Cell>use _.map()</Table.Cell>
-                <Table.Cell>..</Table.Cell>                            
-              </Table.Row>
-            </Table.Body>
+            <DetTable subgroup="Healthcare" categories={HealthCare} />
           </Table>
         </Grid.Column>
         <Grid.Column textAlign="left">
@@ -156,13 +211,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <Table.Body>
-              <Table.Row> 
-                <Table.Cell>Example</Table.Cell>
-                <Table.Cell>use _.map()</Table.Cell>
-                <Table.Cell>..</Table.Cell>                            
-              </Table.Row>
-            </Table.Body>
+            <DetTable subgroup="Socioeconomic Factors" categories={SocioeconomicFactors} />
           </Table>
         </Grid.Column>
       </Grid.Row>
@@ -198,6 +247,29 @@ function MapPanel() {
 }
 
 export default function GADiabetes() {
+  // const [db, setDb] = useState();
+  // const [dbp, setDbp] = useState();
+  
+  // // const get = async()=> {
+  // //   const query = {"subsubgroup":"65 years or older", "county":"DeKalb County"};
+  // //   const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
+  // //   console.log("hhhhh",prom);
+  // //   return prom;
+  // // }
+  // //get();
+  // useEffect(()=>{
+  //   const get = async()=> {
+  //   //get();
+  //   //setDb(get);
+  //     const query = {"subsubgroup":"65 years or older", "county":"DeKalb County"};
+  //     const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
+  //     setDbp(prom);
+  //   };
+  //   //get();
+  // },[]);
+  // console.log("ni hao:" , dbp);
+
+
 
   return (
     <GADMProvider>
