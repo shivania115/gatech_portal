@@ -12,54 +12,77 @@ import {
   List
 } from 'semantic-ui-react'
 import {gatech} from '../stitch/mongodb';
-
+import { aggregateBy, groupBy, process } from '@progress/kendo-data-query';
+import { mean } from "d3-array";
 
 
 function DetTable(props){
   const subgroup = props.subgroup;
   const categories = props.categories;
   const [count,setCount] = useState([]);
+  const [avg,setAvg] = useState([]);
   const {selectedVariable, 
     selectedCounty, 
     actions: {handlePageStateChange}} = useGADM();
 
   const GetValue = async()=> {
     var countArray = [];
+    var avgArray = [];
     const query = {"subgroup":subgroup, "county":selectedCounty.NAME+" County"};
+    const query2 = {"subgroup":subgroup};
     const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
+    const prom2 = await gatech.find(query2,{projection:{"subsubgroup":1,"value":1}}).toArray();
     var obj;
+    var obj2;
     for (obj in prom){
-      countArray.push(prom[obj].value);
+      //var val_temp = Math.round(prom[obj].value *100)/100;
+      var val_temp = parseFloat(prom[obj].value).toFixed(2);
+      countArray.push(val_temp);
     }
+    for (obj2 in prom2){
+      avgArray.push(prom2[obj2]);
+    }
+    const byGroup = avgArray.reduce((acc, index) => {
+      if (!acc[index.subsubgroup]) {
+        acc[index.subsubgroup] = [];
+      }
+      acc[index.subsubgroup].push(index);
+      return acc;
+    }, {});
+    
     setCount(countArray);
+    //setAvg(byGroup);
+    var i1;
+    var i2;
+    var resultArray = [];
+    //console.log(avg);   // set of subsubgroup
+    for (i1 in byGroup){
+      //console.log(avg[i1]);   // each subsubgroup; length 159
+      var sum = 0;
+      for (i2 in byGroup[i1]){
+        sum += byGroup[i1][i2].value;
+      }
+      resultArray.push((sum/159).toFixed(2));
+    }
+    setAvg(resultArray);
   };
 
-  const GetAVG = async()=> {
-    var avgArray = [];
-    const query = {"subgroup":subgroup};
-    const prom2 = await gatech.find(query,{projection:{"":1,"value":1}}).toArray();
-    console.log("prom2", prom2);
-    var obj;
-    for (obj in prom2){
-      avgArray.push(prom2[obj].value);
-    }
-    setCount(avgArray);
-  };
+  
+
+  //console.log(resultArray);
+  
 
   useEffect(()=>{
     GetValue();
   }, [selectedVariable, selectedCounty, subgroup]);
 
-  
-
 
   const zipped = categories.map((category,index) =>{
-    //console.log(count[index]);
     return(
     <Table.Row key={category.toString()}>
       <Table.Cell>{category}</Table.Cell>
       <Table.Cell>{count[index]}</Table.Cell>    
-      <Table.Cell>..</Table.Cell>            
+    <Table.Cell>{avg[index]}</Table.Cell>            
     </Table.Row>);
   });
   return (
