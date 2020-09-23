@@ -16,7 +16,8 @@ export function useGADM() {
 // the React Context we created.
 export function GADMProvider(props) {
   const [pageState, setPageState] = React.useState({
-    selectedVariable: {'varName': 'percentDiabetes', 'printName': '% with Diabetes'},
+    selectedTable: {tableName: 'Demographic Composition',qryName: 'Demographic Composition'},
+    selectedVariable: {'varName': 'statistics', 'printName': 'Statistics Heatmap'},
     selectedCounty: {NAME: 'Fulton', GEOID: '13121'},
   });
 
@@ -27,8 +28,9 @@ export function GADMProvider(props) {
   // We useMemo to improve performance by eliminating some re-renders
   const pageInfo = React.useMemo(
     () => {
-      const { selectedVariable, selectedCounty } = pageState;
+      const { selectedTable, selectedVariable, selectedCounty } = pageState;
       const value = {
+        selectedTable,
         selectedVariable,
         selectedCounty,
         actions: { handlePageStateChange },

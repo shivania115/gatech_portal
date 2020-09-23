@@ -12,123 +12,179 @@ import {
   List
 } from 'semantic-ui-react'
 import {gatech} from '../stitch/mongodb';
-import { aggregateBy, groupBy, process } from '@progress/kendo-data-query';
-import { mean } from "d3-array";
+import { Menu } from 'semantic-ui-react'
+import _ from 'lodash';
+import { active } from "d3";
 
 
 function DetTable(props){
-  const subgroup = props.subgroup;
   const categories = props.categories;
   const [count,setCount] = useState([]);
-  const [avg,setAvg] = useState([]);
+  const [stateAvg,setStateAvg] = useState([]);
   const {selectedVariable, 
     selectedCounty, 
+    selectedTable,
     actions: {handlePageStateChange}} = useGADM();
+  
 
   const GetValue = async()=> {
-    var countArray = [];
-    var avgArray = [];
-    const query = {"subgroup":subgroup, "county":selectedCounty.NAME+" County"};
-    const query2 = {"subgroup":subgroup};
-    const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
-    const prom2 = await gatech.find(query2,{projection:{"subsubgroup":1,"value":1}}).toArray();
-    var obj;
-    var obj2;
-    for (obj in prom){
-      //var val_temp = Math.round(prom[obj].value *100)/100;
-      var val_temp = parseFloat(prom[obj].value).toFixed(2);
-      countArray.push(val_temp);
-    }
-    for (obj2 in prom2){
-      avgArray.push(prom2[obj2]);
-    }
-    const byGroup = avgArray.reduce((acc, index) => {
-      if (!acc[index.subsubgroup]) {
-        acc[index.subsubgroup] = [];
-      }
-      acc[index.subsubgroup].push(index);
-      return acc;
-    }, {});
+
+    const query = {"subgroup":selectedTable.qryName};
+    const prom = await gatech.find(query,{projection:{"subsubgroup":1,"value":1,"county":1}}).toArray();
     
+    //county stats
+    var countArray = _.sortBy(_.filter(prom,['county',selectedCounty.NAME+" County"]),['subsubgroup']);
     setCount(countArray);
-    //setAvg(byGroup);
+    
+    //state avg stats
+    const byGroup = _.groupBy(prom,'subsubgroup');  // sets of subsubgroup; by table; sorted here i guess
     var i1;
-    var i2;
     var resultArray = [];
-    //console.log(avg);   // set of subsubgroup
-    for (i1 in byGroup){
-      //console.log(avg[i1]);   // each subsubgroup; length 159
-      var sum = 0;
-      for (i2 in byGroup[i1]){
-        sum += byGroup[i1][i2].value;
-      }
-      resultArray.push((sum/159).toFixed(2));
+    for (i1 in byGroup){   // each subsubgroup,length 159
+      var mean = _.meanBy(_.reject(byGroup[i1],['value','N/A']),function(o){return o.value;});
+      resultArray.push(mean.toFixed(2));
     }
-    setAvg(resultArray);
+    setStateAvg(resultArray);
   };
-
   
-
-  //console.log(resultArray);
-  
-
   useEffect(()=>{
     GetValue();
-  }, [selectedVariable, selectedCounty, subgroup]);
+  }, [selectedCounty, selectedTable]);
 
-
-  const zipped = categories.map((category,index) =>{
+  const zipped = count.map((obj,index) =>{
+    var val;   //deal with na
+    if (obj.value!= "N/A"){
+      val = obj.value.toFixed(2);
+    } else {
+      val = obj.value;
+    }  
     return(
-    <Table.Row key={category.toString()}>
-      <Table.Cell>{category}</Table.Cell>
-      <Table.Cell>{count[index]}</Table.Cell>    
-    <Table.Cell>{avg[index]}</Table.Cell>            
+    <Table.Row key={index} onClick={()=>{
+           handlePageStateChange({selectedVariable: {varName:obj.subsubgroup,
+                                                    printName:categories[index]}
+                                                  });
+           }}>
+      <Table.Cell>{obj.subsubgroup}</Table.Cell>
+      <Table.Cell>{val}</Table.Cell>    
+    <Table.Cell>{stateAvg[index]}</Table.Cell>            
     </Table.Row>);
   });
+
   return (
     <Table.Body>{zipped}</Table.Body>
   );
 }
 
 
+function MenuButton() {
+  const {selectedTable,
+        actions: {handlePageStateChange}} = useGADM();
+
+  return(
+    <Menu pointing vertical>
+      <Menu.Item name='Demographic Composition' 
+                active = {selectedTable.tableName === 'Demographic Composition'}  
+                onClick={()=>{
+                  handlePageStateChange({selectedTable: {tableName:'Demographic Composition',
+                                                        qryName:'Demographic Composition'}});
+            }}/>
+      <Menu.Item name='Cardiometabolic Disease Morbidity' 
+                active = {selectedTable.tableName === 'Cardiometabolic Disease Morbidity'}  
+                onClick={()=>{
+                      handlePageStateChange({selectedTable: {tableName:'Cardiometabolic Disease Morbidity',
+                                                            qryName:'Cardiometabolic disease morbidity'}});
+            }}/>
+      <Menu.Item name='Clinical Events' 
+                active = {selectedTable.tableName === 'Clinical Events'}  
+                onClick={()=>{
+                      handlePageStateChange({selectedTable: {tableName:'Clinical Events',
+                                                            qryName:'Clinical events'}});
+            }}/>
+      <Menu.Item name='Lifestyle Related Risk Factors' 
+                active = {selectedTable.tableName === 'Lifestyle Related Risk Factors'}  
+                onClick={()=>{
+                      handlePageStateChange({selectedTable: {tableName:'Lifestyle Related Risk Factors',
+                                                            qryName:'Lifestyle Related Risk Factors'}});
+            }}/>
+      <Menu.Item name='Health Care' 
+                active = {selectedTable.tableName === 'Healthcare'}  
+                onClick={()=>{
+                      handlePageStateChange({selectedTable: {tableName:'Healthcare',
+                                                            qryName:'Healthcare'}});
+            }}/>
+      <Menu.Item name='Socioeconomic Factors' 
+                active = { selectedTable.tableName === 'Socioeconomic Factors'}  
+                onClick={()=>{
+                    handlePageStateChange({selectedTable: {tableName:'Socioeconomic Factors',
+                                                          qryName:'Socioeconomic Factors'}});
+            }}/>
+    </Menu>
+  )
+}                          
+
 function DataPanel() {
 
-  const {selectedVariable, 
+  const {selectedTable,
+    selectedVariable, 
     selectedCounty, 
     actions: {handlePageStateChange}} = useGADM();
 
+
   const [count,setCount] = useState([]);
 
-  const DemographicComposition = ["65 years or older",
-                                  "African American",
-                                  "Asian",
-                                  "Foreign born",
-                                  "Hispanic",
-                                  "Median age",
-                                  "Total Population",
-                                  "Women"];
-  const CardioDiseaseMorbidity = ["CHD Prevalence",
-                                  "Diabetes Prevalence",
-                                  "Hypertension Prevalence",
-                                  "Newly diagnosed diabetes",
-                                  "Obesity Prevalence"];
-  const ClinicalEvents = [];
-  const LifestyleRelatedRiskFactors = ["Alcohol Consumption",
-                                        "Physical Inactivity",
-                                        "Sleep",
-                                        "Smoking"];
-  const HealthCare = ["% Diabetes in Medicaid Population",
-                      "Cardiologists",
-                      "Endocrinologists",
-                      "Primary Care Doctors",
-                      "Uninsured"];
-  const SocioeconomicFactors = ["Graduates High School in 4 Years",
-                                "In Poverty",
-                                "Income Inequality",
-                                "Median Income (2015)",
-                                "Unemployed"];
-  
 
+  const RowCat = () =>{    // determines the printname
+    if (selectedTable.tableName=="Demographic Composition") {
+      return(["% of 65 years or older",
+                                    "% of African American",
+                                    "% of Asian",
+                                    "% of Foreign born",
+                                    "% of Hispanic",
+                                    "Median age",
+                                    "Total Population (thousands)",
+                                    "% of Women"]);
+    }
+
+    if (selectedTable.qryName=="Cardiometabolic disease morbidity") {
+      return(["CHD Prevalence",
+              "Diabetes Prevalence",
+              "Hypertension Prevalence",
+              "Newly diagnosed diabetes",
+              "Obesity Prevalence"]);
+    }
+    
+    if (selectedTable.qryName=="Clinical events") {
+      return(["CVD Deaths",
+              "CVD Hospitalizations",
+              "Diabetes Deaths",
+              "Diabetes Hospitalizations",
+              "Kidney Hospitalizations"]);
+    }
+
+
+    if (selectedTable.qryName=="Lifestyle Related Risk Factors"){
+      return(["Alcohol Consumption",
+              "Physical Inactivity",
+              "Sleep",
+              "Smoking"]);
+    }
+
+    if (selectedTable.qryName=="Healthcare"){
+      return(["% Diabetes in Medicaid Population",
+              "Cardiologists",
+              "Endocrinologists",
+              "Primary Care Doctors",
+              "% of Uninsured"]);
+    }
+
+    if (selectedTable.qryName=="Socioeconomic Factors") {
+      return(["Graduates High School in 4 Years",
+              "In Poverty",
+              "Income Inequality",
+              "Median Income (2015)",
+              "Unemployed"]);
+    }
+  }
 
   return (
     <Grid>
@@ -144,8 +200,11 @@ function DataPanel() {
       </Grid.Row>
       <Grid.Row columns={2}>
         <Grid.Column textAlign="left">
+          <MenuButton/>
+        </Grid.Column>
+        <Grid.Column textAlign="left">
           <Header as='h4' style={{fontWeight: 300}}>
-            1. Demographic Composition
+            {selectedTable.tableName}
           </Header>
           <Table selectable basic='very' size='small'  >
             <Table.Header>
@@ -155,10 +214,10 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-            <DetTable subgroup={"Demographic Composition"} categories={DemographicComposition} />
+            <DetTable categories={RowCat()} />
           </Table>
         </Grid.Column>
-        <Grid.Column textAlign="left">
+        {/* <Grid.Column textAlign="left">
           <Header as='h4' style={{fontWeight: 300}}>
             2. Cardiometabolic Disease Morbidity
           </Header>
@@ -170,7 +229,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-              <DetTable subgroup="Cardiometabolic disease morbidity" categories={CardioDiseaseMorbidity} />
+              <DetTable subgroup={selectedTable} categories={CardioDiseaseMorbidity} />
           </Table>
         </Grid.Column>
       </Grid.Row>
@@ -187,7 +246,7 @@ function DataPanel() {
                 <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
-              <DetTable subgroup="Clinical Events" categories={ClinicalEvents} />
+              <DetTable subgroup="Clinical events" categories={ClinicalEvents} />
           </Table>
         </Grid.Column>
         <Grid.Column textAlign="left">
@@ -236,7 +295,7 @@ function DataPanel() {
             </Table.Header>
             <DetTable subgroup="Socioeconomic Factors" categories={SocioeconomicFactors} />
           </Table>
-        </Grid.Column>
+        </Grid.Column> */}
       </Grid.Row>
     </Grid>
   );
@@ -270,28 +329,6 @@ function MapPanel() {
 }
 
 export default function GADiabetes() {
-  // const [db, setDb] = useState();
-  // const [dbp, setDbp] = useState();
-  
-  // // const get = async()=> {
-  // //   const query = {"subsubgroup":"65 years or older", "county":"DeKalb County"};
-  // //   const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
-  // //   console.log("hhhhh",prom);
-  // //   return prom;
-  // // }
-  // //get();
-  // useEffect(()=>{
-  //   const get = async()=> {
-  //   //get();
-  //   //setDb(get);
-  //     const query = {"subsubgroup":"65 years or older", "county":"DeKalb County"};
-  //     const prom = await gatech.find(query,{projection:{"value":1}}).toArray();
-  //     setDbp(prom);
-  //   };
-  //   //get();
-  // },[]);
-  // console.log("ni hao:" , dbp);
-
 
 
   return (

@@ -44,9 +44,11 @@ export default function GAMap(props) {
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    onClick={()=>{}}
-                    onMouseEnter={()=>{
+                    onClick={()=>{
                       handlePageStateChange({selectedCounty: geo.properties});
+                    }}
+                    onMouseEnter={()=>{
+                      //handlePageStateChange({selectedCounty: geo.properties});
                     }}
                     onMouseLeave={()=>{
 
