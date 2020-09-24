@@ -24,6 +24,7 @@ function DetTable(props){
   const {selectedVariable, 
     selectedCounty, 
     selectedTable,
+    fetchedData,
     actions: {handlePageStateChange}} = useGADM();
   
 
@@ -31,13 +32,14 @@ function DetTable(props){
 
     const query = {"subgroup":selectedTable.qryName};
     const prom = await gatech.find(query,{projection:{"subsubgroup":1,"value":1,"county":1}}).toArray();
-    
+
     //county stats
     var countArray = _.sortBy(_.filter(prom,['county',selectedCounty.NAME+" County"]),['subsubgroup']);
     setCount(countArray);
     
     //state avg stats
     const byGroup = _.groupBy(prom,'subsubgroup');  // sets of subsubgroup; by table; sorted here i guess
+    handlePageStateChange({fetchedData:byGroup});   //save for map
     var i1;
     var resultArray = [];
     for (i1 in byGroup){   // each subsubgroup,length 159
@@ -134,7 +136,7 @@ function DataPanel() {
 
 
   const RowCat = () =>{    // determines the printname
-    if (selectedTable.tableName=="Demographic Composition") {
+    if (selectedTable.tableName==="Demographic Composition") {
       return(["% of 65 years or older",
                                     "% of African American",
                                     "% of Asian",
@@ -144,40 +146,34 @@ function DataPanel() {
                                     "Total Population (thousands)",
                                     "% of Women"]);
     }
-
-    if (selectedTable.qryName=="Cardiometabolic disease morbidity") {
+    if (selectedTable.qryName==="Cardiometabolic disease morbidity") {
       return(["CHD Prevalence",
               "Diabetes Prevalence",
               "Hypertension Prevalence",
               "Newly diagnosed diabetes",
               "Obesity Prevalence"]);
     }
-    
-    if (selectedTable.qryName=="Clinical events") {
+    if (selectedTable.qryName==="Clinical events") {
       return(["CVD Deaths",
               "CVD Hospitalizations",
               "Diabetes Deaths",
               "Diabetes Hospitalizations",
               "Kidney Hospitalizations"]);
     }
-
-
-    if (selectedTable.qryName=="Lifestyle Related Risk Factors"){
+    if (selectedTable.qryName==="Lifestyle Related Risk Factors"){
       return(["Alcohol Consumption",
               "Physical Inactivity",
               "Sleep",
               "Smoking"]);
     }
-
-    if (selectedTable.qryName=="Healthcare"){
+    if (selectedTable.qryName==="Healthcare"){
       return(["% Diabetes in Medicaid Population",
               "Cardiologists",
               "Endocrinologists",
               "Primary Care Doctors",
               "% of Uninsured"]);
     }
-
-    if (selectedTable.qryName=="Socioeconomic Factors") {
+    if (selectedTable.qryName==="Socioeconomic Factors") {
       return(["Graduates High School in 4 Years",
               "In Poverty",
               "Income Inequality",
@@ -199,14 +195,14 @@ function DataPanel() {
         </Grid.Column>
       </Grid.Row>
       <Grid.Row columns={2}>
-        <Grid.Column textAlign="left">
+        <Grid.Column textAlign="left" style={{paddingTop: '2em'}}>
           <MenuButton/>
         </Grid.Column>
-        <Grid.Column textAlign="left">
+        <Grid.Column textAlign="left" style={{paddingTop: '2em'}}>
           <Header as='h4' style={{fontWeight: 300}}>
             {selectedTable.tableName}
           </Header>
-          <Table selectable basic='very' size='small'  >
+          <Table selectable basic='very' size='small'>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
@@ -217,85 +213,6 @@ function DataPanel() {
             <DetTable categories={RowCat()} />
           </Table>
         </Grid.Column>
-        {/* <Grid.Column textAlign="left">
-          <Header as='h4' style={{fontWeight: 300}}>
-            2. Cardiometabolic Disease Morbidity
-          </Header>
-          <Table selectable basic='very' size='small'  >
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
-              </Table.Row>
-            </Table.Header>
-              <DetTable subgroup={selectedTable} categories={CardioDiseaseMorbidity} />
-          </Table>
-        </Grid.Column>
-      </Grid.Row>
-      <Grid.Row columns={2}>
-        <Grid.Column textAlign="left">
-          <Header as='h4' style={{fontWeight: 300}}>
-            3. Clinical Events
-          </Header>
-          <Table selectable basic='very' size='small'  >
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
-              </Table.Row>
-            </Table.Header>
-              <DetTable subgroup="Clinical events" categories={ClinicalEvents} />
-          </Table>
-        </Grid.Column>
-        <Grid.Column textAlign="left">
-          <Header as='h4' style={{fontWeight: 300}}>
-            4. Lifestyle Related Risk Factors
-          </Header>
-          <Table selectable basic='very' size='small'  >
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
-              </Table.Row>
-            </Table.Header>
-            <DetTable subgroup="Lifestyle Related Risk Factors" categories={LifestyleRelatedRiskFactors} />
-          </Table>
-        </Grid.Column>
-      </Grid.Row>
-      <Grid.Row columns={2}>
-        <Grid.Column textAlign="left">
-          <Header as='h4' style={{fontWeight: 300}}>
-            5. Health Care
-          </Header>
-          <Table selectable basic='very' size='small'  >
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
-              </Table.Row>
-            </Table.Header>
-            <DetTable subgroup="Healthcare" categories={HealthCare} />
-          </Table>
-        </Grid.Column>
-        <Grid.Column textAlign="left">
-          <Header as='h4' style={{fontWeight: 300}}>
-            6. Socioeconomic Factors
-          </Header>
-          <Table selectable basic='very' size='small'  >
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
-              </Table.Row>
-            </Table.Header>
-            <DetTable subgroup="Socioeconomic Factors" categories={SocioeconomicFactors} />
-          </Table>
-        </Grid.Column> */}
       </Grid.Row>
     </Grid>
   );
@@ -338,7 +255,7 @@ export default function GADiabetes() {
           <Grid.Row columns={1}>
             <Grid.Column textAlign="center">
               <Header as='h1' style={{fontWeight: 300}}>
-                Georgia Diabetes Data Poral
+                Georgia Diabetes Data Portal
                 <Header.Subheader style={{fontWeight: 300}}>
                   Interactive Dashboard of Diabetes-related Health Determinants
                 </Header.Subheader>

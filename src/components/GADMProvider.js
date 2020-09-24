@@ -1,5 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {gatech} from '../stitch/mongodb';
+import _ from 'lodash';
 
 const GADMContext = React.createContext();
 
@@ -15,10 +17,12 @@ export function useGADM() {
 // Create a component that controls auth state and exposes it via
 // the React Context we created.
 export function GADMProvider(props) {
+
   const [pageState, setPageState] = React.useState({
     selectedTable: {tableName: 'Demographic Composition',qryName: 'Demographic Composition'},
-    selectedVariable: {'varName': 'statistics', 'printName': 'Statistics Heatmap'},
-    selectedCounty: {NAME: 'Fulton', GEOID: '13121'},
+    selectedVariable: {'varName': '65 years or older', 'printName': 'Select a Variable to View ->'},
+    selectedCounty: {NAME: 'Fulton'},  //, GEOID: '13121',
+    fetchedData:[],
   });
 
   const handlePageStateChange = (doc) => {
@@ -28,11 +32,12 @@ export function GADMProvider(props) {
   // We useMemo to improve performance by eliminating some re-renders
   const pageInfo = React.useMemo(
     () => {
-      const { selectedTable, selectedVariable, selectedCounty } = pageState;
+      const { selectedTable, selectedVariable, selectedCounty, fetchedData } = pageState;
       const value = {
         selectedTable,
         selectedVariable,
         selectedCounty,
+        fetchedData,
         actions: { handlePageStateChange },
       };
       return value;
