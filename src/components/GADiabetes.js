@@ -22,8 +22,11 @@ function DetTable(props){
   const [stateAvg,setStateAvg] = useState([]);
   const {selectedCounty, 
     selectedTable,
+    selectedVariable,
+    firstRender,
     actions: {handlePageStateChange}} = useGADM();
   const {isLoggedIn} = useStitchAuth();
+
 
   const GetValue = async()=> {
 
@@ -52,6 +55,7 @@ function DetTable(props){
     }
   }, [selectedCounty, selectedTable]);
 
+
   const zipped = count.map((obj,index) =>{
     var val;   //deal with na
     if (obj.value!== "N/A"){
@@ -60,19 +64,26 @@ function DetTable(props){
       val = obj.value;
     }  
     return(
-    <Table.Row key={index} onClick={()=>{
-           handlePageStateChange({selectedVariable: {varName:obj.subsubgroup,
+    <Table.Row textAlign="center" key={index} 
+              onClick={()=>{
+                handlePageStateChange({selectedVariable: {varName:obj.subsubgroup,
                                                     printName:categories[index]}
-                                                  });
-           }}>
-      <Table.Cell>{obj.subsubgroup}</Table.Cell>
-      <Table.Cell>{val}</Table.Cell>    
-    <Table.Cell>{stateAvg[index]}</Table.Cell>            
+                                                  });}}
+                active = {selectedVariable.printName === categories[index]} >
+      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle"}}>{obj.subsubgroup}</Table.Cell>
+      <Table.Cell style={{verticalAlign:"middle"}}>{val}</Table.Cell>    
+      <Table.Cell style={{verticalAlign:"middle"}}>{stateAvg[index]}</Table.Cell>            
     </Table.Row>);
   });
 
-  return (
-    <Table.Body>{zipped}</Table.Body>
+  
+  if (firstRender === true){
+    handlePageStateChange({firstRender:false});
+  }
+
+
+    return (
+      <Table.Body>{zipped}</Table.Body>
   );
 }
 
@@ -194,16 +205,16 @@ function DataPanel() {
         <Grid.Column textAlign="left" style={{paddingTop: '4em', paddingLeft:'4em'}}>
           <MenuButton/>
         </Grid.Column>
-        <Grid.Column textAlign="left" style={{paddingTop: '4em'}}>
+        <Grid.Column textAlign="center" style={{paddingTop: '4em'}}>
           <Header as='h4' style={{fontWeight: 300}}>
             {selectedTable.tableName}
           </Header>
-          <Table selectable basic='very' size='small'>
+          <Table selectable basic='very' fixed>    
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0}}>State Stat</Table.HeaderCell>                                
+                <Table.HeaderCell style={{borderTop: 0, textAlign:"center", width:'44%'}}>Variable</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, textAlign:"center", width:'30%'}}>County Stat</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, textAlign:"center", width:'26%'}}>State Stat</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
             <DetTable categories={RowCat()} />

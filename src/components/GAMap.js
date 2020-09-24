@@ -4,6 +4,7 @@ import Geography from './Geography';
 import ComposableMap from './ComposableMap';
 import { scaleQuantile } from "d3-scale";
 import {useGADM} from './GADMProvider';
+import { useStitchAuth } from "./StitchAuth";
 import _ from 'lodash';
 
 const geoUrl ="https://raw.githubusercontent.com/deldersveld/topojson/master/countries/us-states/GA-13-georgia-counties.json"
@@ -12,8 +13,10 @@ const geoUrl ="https://raw.githubusercontent.com/deldersveld/topojson/master/cou
 export default function GAMap(props) {
   const [hover, setHover] = useState(0);
   const {selectedVariable, 
+    selectedTable,
     selectedCounty, 
     fetchedData,
+    firstRender,
     actions: {handlePageStateChange}} = useGADM();
   const colorPalette = [
     "#edcfa9",
@@ -28,6 +31,7 @@ export default function GAMap(props) {
   const [legendSplit, setLegendSplit] = useState([]);
   const [legendMin, setLegendMin] = useState();
   const [legendMax, setLegendMax] = useState();
+
   
   useEffect(()=>{
     var varData = _.map(fetchedData[selectedVariable.varName],'value');
@@ -41,8 +45,10 @@ export default function GAMap(props) {
     });
     setMapColor(scaleMap);
     setLegendSplit(scaler.quantiles());
-  },[selectedVariable]);
+    console.log("sm",scaleMap);
+  },[selectedVariable,firstRender]);
 
+  console.log(fetchedData);
   console.log(mapColor);
 
 
@@ -77,8 +83,8 @@ export default function GAMap(props) {
     }
   };
 
-  //Legend();
 
+  
   return (
       <div>  
         <ComposableMap 
@@ -109,7 +115,6 @@ export default function GAMap(props) {
                       setHover(0);
                     }}
                     fill = {(hover===geo.properties.GEOID) ? colorHighlight:
-                      (Object.keys(mapColor).length===0)? 'white':
                       (mapColor[(geo.properties.NAME+" County")]===undefined)?'white':mapColor[(geo.properties.NAME+" County")]}
                     strokeWidth = {selectedCounty.GEOID===geo.properties.GEOID ? 3.5:0.5}
                     stroke = {selectedCounty.GEOID===geo.properties.GEOID ? 'red':'black'}

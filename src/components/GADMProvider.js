@@ -18,9 +18,10 @@ export function GADMProvider(props) {
 
   const [pageState, setPageState] = React.useState({
     selectedTable: {tableName: 'Demographic Composition',qryName: 'Demographic Composition'},
-    selectedVariable: {'varName': '65 years or older', 'printName': 'Statistics Heatmap'},
-    selectedCounty: {NAME: 'Fulton'},  //, GEOID: '13121',
+    selectedVariable: {'varName': '65 years or older', 'printName': '% of 65 years or older'},
+    selectedCounty: {NAME: 'Fulton', GEOID: '13121'}, 
     fetchedData:[],
+    firstRender: true,
   });
 
   const handlePageStateChange = (doc) => {
@@ -31,12 +32,13 @@ export function GADMProvider(props) {
   // We useMemo to improve performance by eliminating some re-renders
   const pageInfo = React.useMemo(
     () => {
-      const { selectedTable, selectedVariable, selectedCounty, fetchedData } = pageState;
+      const { selectedTable, selectedVariable, selectedCounty, fetchedData,firstRender } = pageState;
       const value = {
         selectedTable,
         selectedVariable,
         selectedCounty,
         fetchedData,
+        firstRender,
         actions: { handlePageStateChange },
       };
       return value;
