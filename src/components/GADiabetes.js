@@ -1,6 +1,5 @@
 // React
-import React, {useEffect, useState, setState} from "react";
-import ErrorBoundary from "react-error-boundary";
+import React, {useEffect, useState} from "react";
 import GAMap from "./GAMap";
 import {GADMProvider, useGADM} from './GADMProvider';
 import { 
@@ -14,17 +13,14 @@ import {
 import {gatech} from '../stitch/mongodb';
 import { Menu } from 'semantic-ui-react'
 import _ from 'lodash';
-import { active } from "d3";
 
 
 function DetTable(props){
   const categories = props.categories;
   const [count,setCount] = useState([]);
   const [stateAvg,setStateAvg] = useState([]);
-  const {selectedVariable, 
-    selectedCounty, 
+  const {selectedCounty, 
     selectedTable,
-    fetchedData,
     actions: {handlePageStateChange}} = useGADM();
   
 
@@ -44,7 +40,7 @@ function DetTable(props){
     var resultArray = [];
     for (i1 in byGroup){   // each subsubgroup,length 159
       var mean = _.meanBy(_.reject(byGroup[i1],['value','N/A']),function(o){return o.value;});
-      resultArray.push(mean.toFixed(2));
+      resultArray.push(mean.toFixed(1));
     }
     setStateAvg(resultArray);
   };
@@ -55,8 +51,8 @@ function DetTable(props){
 
   const zipped = count.map((obj,index) =>{
     var val;   //deal with na
-    if (obj.value!= "N/A"){
-      val = obj.value.toFixed(2);
+    if (obj.value!== "N/A"){
+      val = obj.value.toFixed(1);
     } else {
       val = obj.value;
     }  
@@ -83,14 +79,14 @@ function MenuButton() {
         actions: {handlePageStateChange}} = useGADM();
 
   return(
-    <Menu pointing vertical>
-      <Menu.Item name='Demographic Composition' 
+    <Menu pointing vertical size='small'>
+      <Menu.Item name='Demographic Composition'
                 active = {selectedTable.tableName === 'Demographic Composition'}  
                 onClick={()=>{
                   handlePageStateChange({selectedTable: {tableName:'Demographic Composition',
                                                         qryName:'Demographic Composition'}});
             }}/>
-      <Menu.Item name='Cardiometabolic Disease Morbidity' 
+      <Menu.Item name='Cardiometabolic Disease Morbidity'
                 active = {selectedTable.tableName === 'Cardiometabolic Disease Morbidity'}  
                 onClick={()=>{
                       handlePageStateChange({selectedTable: {tableName:'Cardiometabolic Disease Morbidity',
@@ -130,9 +126,6 @@ function DataPanel() {
     selectedVariable, 
     selectedCounty, 
     actions: {handlePageStateChange}} = useGADM();
-
-
-  const [count,setCount] = useState([]);
 
 
   const RowCat = () =>{    // determines the printname
@@ -189,16 +182,16 @@ function DataPanel() {
           <Header as='h3' style={{fontWeight: 300}}>
             Statistics of {selectedCounty.NAME}
             <Header.Subheader style={{fontWeight: 300}}>
-              The tables below show diabetes-related health determinants of the {selectedCounty.NAME} county.
+              The table below show diabetes-related health determinants of {selectedCounty.NAME} county.
             </Header.Subheader>
           </Header>
         </Grid.Column>
       </Grid.Row>
       <Grid.Row columns={2}>
-        <Grid.Column textAlign="left" style={{paddingTop: '2em'}}>
+        <Grid.Column textAlign="left" style={{paddingTop: '2em', paddingLeft:'3em'}}>
           <MenuButton/>
         </Grid.Column>
-        <Grid.Column textAlign="left" style={{paddingTop: '2em'}}>
+        <Grid.Column textAlign="left" style={{paddingTop: '4em'}}>
           <Header as='h4' style={{fontWeight: 300}}>
             {selectedTable.tableName}
           </Header>
@@ -227,10 +220,10 @@ function MapPanel() {
     <Grid>
       <Grid.Row>
         <Grid.Column>
-          <Header as='h3' style={{fontWeight: 300}}>
+          <Header as='h3' style={{fontWeight: 300, paddingLeft:'2em', height:'3em'}}>
             {selectedVariable.printName}
             <Header.Subheader style={{fontWeight: 300}}>
-              The color on the map shows the {selectedVariable.printName} of the Georgia Counties.
+              The color shows the distribution of {selectedVariable.printName} across the Georgia counties.
             </Header.Subheader>
           </Header>
         </Grid.Column>
@@ -278,10 +271,10 @@ export default function GADiabetes() {
           <Divider/>
           <Grid.Row columns={2}>
             <Grid.Column width={8} textAlign="center">
-              <MapPanel />
+              <DataPanel />
             </Grid.Column>
             <Grid.Column width={8} textAlign="center">
-              <DataPanel />
+              <MapPanel />
             </Grid.Column>
           </Grid.Row>
         </Grid>
