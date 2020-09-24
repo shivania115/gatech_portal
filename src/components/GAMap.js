@@ -21,7 +21,7 @@ export default function GAMap(props) {
     "#d57149", 
     "#aa4a30"
   ];
-  const colorHighlight = '#89beb3';
+  const colorHighlight = 'white';
   const [mapColor, setMapColor] = useState(0);
   
   useEffect(()=>{
