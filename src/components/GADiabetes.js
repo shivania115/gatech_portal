@@ -2,6 +2,7 @@
 import React, {useEffect, useState} from "react";
 import GAMap from "./GAMap";
 import {GADMProvider, useGADM} from './GADMProvider';
+import { useStitchAuth } from "./StitchAuth";
 import { 
   Container, 
   Grid, 
@@ -22,7 +23,7 @@ function DetTable(props){
   const {selectedCounty, 
     selectedTable,
     actions: {handlePageStateChange}} = useGADM();
-  
+  const {isLoggedIn} = useStitchAuth();
 
   const GetValue = async()=> {
 
@@ -46,7 +47,9 @@ function DetTable(props){
   };
   
   useEffect(()=>{
-    GetValue();
+    if (isLoggedIn === true){
+      GetValue();
+    }
   }, [selectedCounty, selectedTable]);
 
   const zipped = count.map((obj,index) =>{
@@ -188,7 +191,7 @@ function DataPanel() {
         </Grid.Column>
       </Grid.Row>
       <Grid.Row columns={2}>
-        <Grid.Column textAlign="left" style={{paddingTop: '2em', paddingLeft:'3em'}}>
+        <Grid.Column textAlign="left" style={{paddingTop: '4em', paddingLeft:'4em'}}>
           <MenuButton/>
         </Grid.Column>
         <Grid.Column textAlign="left" style={{paddingTop: '4em'}}>
@@ -258,12 +261,16 @@ export default function GADiabetes() {
               </Header>
               <List bulleted style={{fontWeight: 300}} size="mini">
                 <List.Item>
-                  Click on a county on the map located <i>(on the left)</i> <br/>
-                  to see its full statistics on the table <i>(on the right)</i>.
+                  Click on a category in the menu to see the variables <br/>
+                  under each category in the table.
                 </List.Item>
                 <List.Item>
-                  Click on a variable on the table located <i>(on the right)</i> <br/>
-                  to see the county-level distribution on the map <i>(on the left)</i>.
+                  Click on a variable on the table located <i>on the left</i> <br/>
+                  to see the county-level distribution on the map <i>on the right</i>.
+                </List.Item>
+                <List.Item>
+                  Click on a county on the map located <i>on the right</i> <br/>
+                  to see its full statistics on the table <i>on the left</i>.
                 </List.Item>                
               </List>
             </Grid.Column>
