@@ -18,7 +18,7 @@ export function GADMProvider(props) {
 
   const [pageState, setPageState] = React.useState({
     selectedTable: {tableName: 'Demographic Composition',qryName: 'Demographic Composition'},
-    selectedVariable: {'varName': '65 years or older', 'printName': '% of 65 years or older'},
+    selectedVariable: {'varName': '65 years or older', 'printName': '% of 65 y or older'},
     selectedCounty: {NAME: 'Fulton', GEOID: '13121'}, 
     fetchedData:[],
     firstRender: true,

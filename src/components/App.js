@@ -4,6 +4,7 @@ import React, {useEffect, } from "react";
 import GADiabetes from "./GADiabetes";
 import { StitchAuthProvider, useStitchAuth } from "./StitchAuth";
 import 'semantic-ui-css/semantic.min.css'
+import '../styles.css'
 
 App.propTypes = {};
 export default function App() {

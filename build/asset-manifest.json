@@ -1,14 +1,15 @@
 {
-  "main.js": "/gatech_portal/static/js/main.faf30d45.chunk.js",
-  "main.js.map": "/gatech_portal/static/js/main.faf30d45.chunk.js.map",
+  "main.js": "/gatech_portal/static/js/main.58200a00.chunk.js",
+  "main.js.map": "/gatech_portal/static/js/main.58200a00.chunk.js.map",
   "runtime~main.js": "/gatech_portal/static/js/runtime~main.23111b35.js",
   "runtime~main.js.map": "/gatech_portal/static/js/runtime~main.23111b35.js.map",
   "static/css/2.65e2783b.chunk.css": "/gatech_portal/static/css/2.65e2783b.chunk.css",
-  "static/js/2.6d293c6c.chunk.js": "/gatech_portal/static/js/2.6d293c6c.chunk.js",
-  "static/js/2.6d293c6c.chunk.js.map": "/gatech_portal/static/js/2.6d293c6c.chunk.js.map",
+  "static/js/2.ee536907.chunk.js": "/gatech_portal/static/js/2.ee536907.chunk.js",
+  "static/js/2.ee536907.chunk.js.map": "/gatech_portal/static/js/2.ee536907.chunk.js.map",
   "index.html": "/gatech_portal/index.html",
-  "precache-manifest.feec6c69ae5d34264307982799f6b8ab.js": "/gatech_portal/precache-manifest.feec6c69ae5d34264307982799f6b8ab.js",
+  "precache-manifest.053d37d430436ed165b66822d9673707.js": "/gatech_portal/precache-manifest.053d37d430436ed165b66822d9673707.js",
   "service-worker.js": "/gatech_portal/service-worker.js",
   "static/css/2.65e2783b.chunk.css.map": "/gatech_portal/static/css/2.65e2783b.chunk.css.map",
+  "static/media/bg2.jpg": "/gatech_portal/static/media/bg2.c3778cd6.jpg",
   "static/media/semantic.min.css": "/gatech_portal/static/media/outline-icons.ef60a4f6.woff"
 }

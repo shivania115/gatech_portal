@@ -9,11 +9,12 @@ import {
   Table,
   Header,
   Divider,
-  List
+  List, Segment
 } from 'semantic-ui-react'
 import {gatech} from '../stitch/mongodb';
-import { Menu } from 'semantic-ui-react'
+import { Menu,Button } from 'semantic-ui-react'
 import _ from 'lodash';
+import styled from 'styled-components';
 
 
 function DetTable(props){
@@ -55,6 +56,12 @@ function DetTable(props){
     }
   }, [selectedCounty, selectedTable]);
 
+  // const MyRow = styled(Table.Row)`
+  // &:active {
+  //   background: orange !important;
+  //   color:red !important;
+  // }
+  // `;
 
   const zipped = count.map((obj,index) =>{
     var val;   //deal with na
@@ -64,15 +71,17 @@ function DetTable(props){
       val = obj.value;
     }  
     return(
-    <Table.Row textAlign="center" key={index} 
+    <Table.Row key={index}
               onClick={()=>{
                 handlePageStateChange({selectedVariable: {varName:obj.subsubgroup,
                                                     printName:categories[index]}
                                                   });}}
-                active = {selectedVariable.printName === categories[index]} >
-      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle"}}>{obj.subsubgroup}</Table.Cell>
-      <Table.Cell style={{verticalAlign:"middle"}}>{val}</Table.Cell>    
-      <Table.Cell style={{verticalAlign:"middle"}}>{stateAvg[index]}</Table.Cell>            
+                active = {selectedVariable.printName === categories[index]}
+                >
+                  {/* style ={{color: selectedVariable.printName === categories[index] ? 'red':'green'}} */}
+      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"left", paddingLeft:'0.5em'}}>{categories[index]}</Table.Cell>
+      <Table.Cell style={{fontSize: '1em',verticalAlign:"middle",textAlign:"center"}}>{val}</Table.Cell>    
+      <Table.Cell style={{fontSize: '1em',verticalAlign:"middle",textAlign:"center"}}>{stateAvg[index]}</Table.Cell>            
     </Table.Row>);
   });
 
@@ -83,7 +92,7 @@ function DetTable(props){
 
 
     return (
-      <Table.Body>{zipped}</Table.Body>
+    <Table.Body>{zipped}</Table.Body>
   );
 }
 
@@ -93,42 +102,56 @@ function MenuButton() {
         actions: {handlePageStateChange}} = useGADM();
 
   return(
-    <Menu pointing vertical size='small'>
-      <Menu.Item name='Demographic Composition'
+    <Menu vertical tabular inverted style={{height:'100%',width:'95%'}}>   
+    {/* ,width:'90%' */}
+      <Menu.Item name='Demographic Composition' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
                 active = {selectedTable.tableName === 'Demographic Composition'}  
                 onClick={()=>{
                   handlePageStateChange({selectedTable: {tableName:'Demographic Composition',
                                                         qryName:'Demographic Composition'}});
             }}/>
-      <Menu.Item name='Cardiometabolic Disease Morbidity'
+      <Menu.Item name='Cardiometabolic Disease Morbidity' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
                 active = {selectedTable.tableName === 'Cardiometabolic Disease Morbidity'}  
                 onClick={()=>{
                       handlePageStateChange({selectedTable: {tableName:'Cardiometabolic Disease Morbidity',
                                                             qryName:'Cardiometabolic disease morbidity'}});
             }}/>
-      <Menu.Item name='Clinical Events' 
+      <Menu.Item name='Clinical Events' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
                 active = {selectedTable.tableName === 'Clinical Events'}  
                 onClick={()=>{
                       handlePageStateChange({selectedTable: {tableName:'Clinical Events',
                                                             qryName:'Clinical events'}});
             }}/>
-      <Menu.Item name='Lifestyle Related Risk Factors' 
+      <Menu.Item name='Lifestyle Related Risk Factors' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
                 active = {selectedTable.tableName === 'Lifestyle Related Risk Factors'}  
                 onClick={()=>{
                       handlePageStateChange({selectedTable: {tableName:'Lifestyle Related Risk Factors',
                                                             qryName:'Lifestyle Related Risk Factors'}});
             }}/>
-      <Menu.Item name='Health Care' 
+      <Menu.Item name='Health Care' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
                 active = {selectedTable.tableName === 'Healthcare'}  
                 onClick={()=>{
                       handlePageStateChange({selectedTable: {tableName:'Healthcare',
                                                             qryName:'Healthcare'}});
             }}/>
-      <Menu.Item name='Socioeconomic Factors' 
+      <Menu.Item name='Socioeconomic Factors' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
                 active = { selectedTable.tableName === 'Socioeconomic Factors'}  
                 onClick={()=>{
                     handlePageStateChange({selectedTable: {tableName:'Socioeconomic Factors',
                                                           qryName:'Socioeconomic Factors'}});
+            }}/>
+      <Menu.Item name='Environmental Factors' style={{lineHeight:'1.3em', color:'black'}}
+                color='blue'
+                active = { selectedTable.tableName === 'Environmental Factors'}  
+                onClick={()=>{
+                    handlePageStateChange({selectedTable: {tableName:'Environmental Factors',
+                                                          qryName:'Environmental Factors'}});
             }}/>
     </Menu>
   )
@@ -144,48 +167,54 @@ function DataPanel() {
 
   const RowCat = () =>{    // determines the printname
     if (selectedTable.tableName==="Demographic Composition") {
-      return(["% of 65 years or older",
-                                    "% of African American",
-                                    "% of Asian",
-                                    "% of Foreign born",
-                                    "% of Hispanic",
-                                    "Median age",
-                                    "Total Population (thousands)",
-                                    "% of Women"]);
+      return(["% of 65 y or older",
+                                    "% Black/African American",
+                                    "% Asian",
+                                    "% Foreign born",
+                                    "% Hispanic",
+                                    "Median age (y)",
+                                    "Total Population, thousands",
+                                    "% Women"]);
     }
     if (selectedTable.qryName==="Cardiometabolic disease morbidity") {
-      return(["CHD Prevalence",
-              "Diabetes Prevalence",
-              "Hypertension Prevalence",
-              "Newly diagnosed diabetes",
-              "Obesity Prevalence"]);
+      return(["% CHD Prevalence in Medicaid population",
+              "% with Diabetes",
+              "% with Hypertension in Medicaid population",
+              "Newly diagnosed diabetes (new cases per 1,000)",
+              "% Obese"]);
     }
     if (selectedTable.qryName==="Clinical events") {
-      return(["CVD Deaths",
-              "CVD Hospitalizations",
-              "Diabetes Deaths",
-              "Diabetes Hospitalizations",
-              "Kidney Hospitalizations"]);
+      return(["CVD deaths per 100,000",
+              "CVD hospitalizations per 100,000",
+              "Diabetes deaths per 100,000",
+              "Diabetes hospitalizations per 100,000",
+              "Kidney hospitalizations per 100,000"]);
     }
     if (selectedTable.qryName==="Lifestyle Related Risk Factors"){
-      return(["Alcohol Consumption",
-              "Physical Inactivity",
-              "Sleep",
-              "Smoking"]);
+      return(["% Excessive drinkers",
+              "% Physical inactive",
+              "% Insufficient sleep (<7 hours)",
+              "% Current Smokers"]);
     }
     if (selectedTable.qryName==="Healthcare"){
       return(["% Diabetes in Medicaid Population",
               "Cardiologists",
               "Endocrinologists",
-              "Primary Care Doctors",
-              "% of Uninsured"]);
+              "Primary care doctors (ratio of population to primary care physicians)",
+              "% Uninsured"]);
     }
     if (selectedTable.qryName==="Socioeconomic Factors") {
-      return(["Graduates High School in 4 Years",
-              "In Poverty",
+      return(["% Graduates high school in 4 years",
+              "% In poverty",
               "Income Inequality",
-              "Median Income (2015)",
-              "Unemployed"]);
+              "Median income ($)",
+              "% Unemployed"]);
+    }
+    if (selectedTable.qryName==="Environmental Factors") {
+      return(["% Exercise opportunities",
+              "Food environment index",
+              "% Severe housing problems",
+              "Residential segregation score"]);
     }
   }
 
@@ -194,7 +223,7 @@ function DataPanel() {
       <Grid.Row>
         <Grid.Column>
           <Header as='h3' style={{fontWeight: 300}}>
-            Statistics of {selectedCounty.NAME}
+            Statistics of {selectedCounty.NAME} County
             <Header.Subheader style={{fontWeight: 300}}>
               The table below show diabetes-related health determinants of {selectedCounty.NAME} county.
             </Header.Subheader>
@@ -202,19 +231,27 @@ function DataPanel() {
         </Grid.Column>
       </Grid.Row>
       <Grid.Row columns={2}>
-        <Grid.Column textAlign="left" style={{paddingTop: '4em', paddingLeft:'4em'}}>
-          <MenuButton/>
+        <Grid.Column textAlign="left" style={{paddingTop: '1em', paddingLeft:'4em'}}>
+          <Grid.Row>
+            <Header as='h4' style={{fontWeight: 300, color:'#da291c', paddingLeft:'1em'}}><i><b>Select a category of county characteristics for display</b></i></Header>
+          </Grid.Row>
+          <Grid.Row style={{paddingTop: '1.2em', width:'95%'}}>
+            <MenuButton/>
+          </Grid.Row>
         </Grid.Column>
-        <Grid.Column textAlign="center" style={{paddingTop: '4em'}}>
-          <Header as='h4' style={{fontWeight: 300}}>
+        <Grid.Column style={{paddingTop: '2.4em',textAlign:"center"}}>
+          {/* <Grid.Row> */}
+          <Header block as='h4' style={{fontWeight: 550, backgroundColor:'#012169',color:'whitesmoke', verticalAlign:'center',margin:'0em',paddingTop:'0.4em',paddingBottom:'0.4em',border:'0',borderRadius:'0.6em 0em 0.6em 0em'}}>
+          {/* style={{fontWeight: 550, color:'#012169',verticalAlign:'center',margin:'0em',paddingTop:'0.4em',paddingBottom:'0.4em',border:'0',borderRadius:'0.6em 0em 0.6em 0em'}}  */}
             {selectedTable.tableName}
           </Header>
-          <Table selectable basic='very' fixed>    
+          {/* </Grid.Row> */}
+          <Table selectable basic='very' fixed style={{width:'100%'}}>    
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0, textAlign:"center", width:'44%'}}>Variable</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, textAlign:"center", width:'30%'}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, textAlign:"center", width:'26%'}}>State Stat</Table.HeaderCell>                                
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'49%'}}>Characteristic</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'29%'}}>County Stat</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'24%'}}>State Mean</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
             <DetTable categories={RowCat()} />
@@ -234,15 +271,18 @@ function MapPanel() {
     <Grid>
       <Grid.Row>
         <Grid.Column>
-          <Header as='h3' style={{fontWeight: 300, paddingLeft:'2em', height:'3em'}}>
+          <Header as='h3' style={{fontWeight: 600, paddingLeft:'2em', height:'3em',color:'#b58500'}}>
             {selectedVariable.printName}
-            <Header.Subheader style={{fontWeight: 300}}>
+            <Header.Subheader style={{fontWeight: 300, margin:'0em'}}>
               The color shows the distribution of {selectedVariable.printName} across the Georgia counties.
             </Header.Subheader>
           </Header>
+          <Header as='h4' style={{fontWeight: 300, paddingTop:'1.2em', paddingLeft:'4em', paddingBottom:'-1em', textAlign:'left',color:'#da291c'}}>
+            <i><b>Select a county to see detailed characteristics</b></i>
+          </Header>
         </Grid.Column>
       </Grid.Row>
-      <Grid.Row>
+      <Grid.Row style={{padding:'0'}}>
         <Grid.Column>
           <GAMap />
         </Grid.Column>
@@ -257,26 +297,28 @@ export default function GADiabetes() {
 
   return (
     <GADMProvider>
-      <Container>
+      <Container style={{paddingLeft: '0em', paddingRight:'0em'}}>
         <Grid style={{paddingTop: '2em'}}>
-          <Grid.Row columns={1}>
+          <Grid.Row columns={1}
+          style={{ backgroundColor: `#FFFFF`}}>
+            {/* style={{ backgroundImage: `url(${require("../bg2.jpg")})`}} `#d9d9d6`*/}
             <Grid.Column textAlign="center">
-              <Header as='h1' style={{fontWeight: 300}}>
+              <Header as='h1' style={{fontWeight: 300,color:'black'}}>
                 Georgia Diabetes Data Portal
-                <Header.Subheader style={{fontWeight: 300}}>
+                <Header.Subheader style={{fontWeight: 300,color:'black'}}>
                   Interactive Dashboard of Diabetes-related Health Determinants
                 </Header.Subheader>
               </Header>
-              <Header as='h4' style={{fontWeight: 300}}>
+              {/* <Header as='h4' style={{fontWeight: 300}}>
                 A Quick User Guide
-              </Header>
-              <List bulleted style={{fontWeight: 300}} size="mini">
+              </Header> */}
+              <List bulleted style={{fontWeight: 300, color:'black'}} size="mini">
                 <List.Item>
-                  Click on a category in the menu to see the variables <br/>
-                  under each category in the table.
+                  Click on a category in the menu to see the <br/>
+                  characteristics under each category in the table.
                 </List.Item>
                 <List.Item>
-                  Click on a variable on the table located <i>on the left</i> <br/>
+                  Click on a Characteristic on the table located <i>on the left</i> <br/>
                   to see the county-level distribution on the map <i>on the right</i>.
                 </List.Item>
                 <List.Item>

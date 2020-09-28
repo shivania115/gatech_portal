@@ -19,14 +19,13 @@ export default function GAMap(props) {
     firstRender,
     actions: {handlePageStateChange}} = useGADM();
   const colorPalette = [
-    "#edcfa9",
-    "#e89f71",
-    "#d57149", 
-    "#aa4a30",
-    "#7d321e",
-    "#541f11"
+    "#D8E7E9",
+    "#A4C8CB",
+    "#71A8AD", 
+    "#4A7C82",
+    "#34575B",
+    "#253E41"
   ];
-  const colorHighlight = 'yellow';
   const [mapColor, setMapColor] = useState(0);
   const [legendSplit, setLegendSplit] = useState([]);
   const [legendMin, setLegendMin] = useState();
@@ -55,7 +54,7 @@ export default function GAMap(props) {
   const Legend = () => {
     if (Object.keys(mapColor).length>0) {
       return (
-      <svg width="280" height="80" transform="translate(-20,-45)">
+      <svg width="280" height="80" transform="translate(-20,-60)">
         {_.map(legendSplit, (splitpoint, i) => {
           if(legendSplit[i] < 1){
             return <text key = {i} x={64 + 24 * (i)} y={35} style={{fontSize: '0.6em'}}> {legendSplit[i].toFixed(1)}</text>                    
@@ -98,7 +97,7 @@ export default function GAMap(props) {
           projectionConfig={{scale: 6000}}
           
            >
-          <Geographies geography={geoUrl} transform="translate(10,5)">
+          <Geographies geography={geoUrl} transform="translate(10,3)">
             {({ geographies }) => 
               <svg>
                 {geographies.map(geo => (
@@ -114,10 +113,10 @@ export default function GAMap(props) {
                     onMouseLeave={()=>{
                       setHover(0);
                     }}
-                    fill = {(hover===geo.properties.GEOID) ? colorHighlight:
+                    fill = {(hover===geo.properties.GEOID) ? '#f2a900':
                       (mapColor[(geo.properties.NAME+" County")]===undefined)?'white':mapColor[(geo.properties.NAME+" County")]}
                     strokeWidth = {selectedCounty.GEOID===geo.properties.GEOID ? 3.5:0.5}
-                    stroke = {selectedCounty.GEOID===geo.properties.GEOID ? 'red':'black'}
+                    stroke = {selectedCounty.GEOID===geo.properties.GEOID ? '#da291c':'black'}
                   />
                 ))}
               </svg>
