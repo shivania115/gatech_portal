@@ -34,6 +34,8 @@ function DetTable(props){
     const query = {"subgroup":selectedTable.qryName};
     const prom = await gatech.find(query,{projection:{"subsubgroup":1,"value":1,"county":1}}).toArray();
 
+    //console.log(Object.keys(prom[0])[1])
+
     //county stats
     var countArray = _.sortBy(_.filter(prom,['county',selectedCounty.NAME+" County"]),['subsubgroup']);
     setCount(countArray);
@@ -56,12 +58,6 @@ function DetTable(props){
     }
   }, [selectedCounty, selectedTable]);
 
-  // const MyRow = styled(Table.Row)`
-  // &:active {
-  //   background: orange !important;
-  //   color:red !important;
-  // }
-  // `;
 
   const zipped = count.map((obj,index) =>{
     var val;   //deal with na
@@ -80,8 +76,8 @@ function DetTable(props){
                 >
                   {/* style ={{color: selectedVariable.printName === categories[index] ? 'red':'green'}} */}
       <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"left", paddingLeft:'0.5em'}}>{categories[index]}</Table.Cell>
-      <Table.Cell style={{fontSize: '1em',verticalAlign:"middle",textAlign:"center"}}>{val}</Table.Cell>    
-      <Table.Cell style={{fontSize: '1em',verticalAlign:"middle",textAlign:"center"}}>{stateAvg[index]}</Table.Cell>            
+      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{val}</Table.Cell>    
+      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{stateAvg[index]}</Table.Cell>            
     </Table.Row>);
   });
 
@@ -197,7 +193,7 @@ function DataPanel() {
               "% Current Smokers"]);
     }
     if (selectedTable.qryName==="Healthcare"){
-      return(["% Diabetes in Medicaid Population",
+      return(["% Diabetes Screening",
               "Cardiologists",
               "Endocrinologists",
               "Primary care doctors (ratio of population to primary care physicians)",
@@ -249,9 +245,9 @@ function DataPanel() {
           <Table selectable basic='very' fixed style={{width:'100%'}}>    
             <Table.Header>
               <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'49%'}}>Characteristic</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'29%'}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'24%'}}>State Mean</Table.HeaderCell>                                
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'50%'}}>Characteristic</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'27%', paddingLeft:'0',paddingRight:'0'}}>County Stat</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'25%'}}>State Mean</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
             <DetTable categories={RowCat()} />
@@ -293,11 +289,20 @@ function MapPanel() {
 }
 
 export default function GADiabetes() {
-
+  const [Warning, setWarning] = useState(false);
+  
+  useEffect(()=>{
+    var d = document, root= d.documentElement, body= d.body;
+    var wid = window.innerWidth || root.clientWidth || body.clientWidth;
+    if (wid<1200){
+      setWarning(true);
+    }
+  },[]
+  )
 
   return (
     <GADMProvider>
-      <Container style={{paddingLeft: '0em', paddingRight:'0em'}}>
+      <Container>
         <Grid style={{paddingTop: '2em'}}>
           <Grid.Row columns={1}
           style={{ backgroundColor: `#FFFFF`}}>
@@ -306,7 +311,7 @@ export default function GADiabetes() {
               <Header as='h1' style={{fontWeight: 300,color:'black'}}>
                 Georgia Diabetes Data Portal
                 <Header.Subheader style={{fontWeight: 300,color:'black'}}>
-                  Interactive Dashboard of Diabetes-related Health Determinants
+                  Interactive Dashboard of Diabetes-Related Health Determinants
                 </Header.Subheader>
               </Header>
               {/* <Header as='h4' style={{fontWeight: 300}}>
@@ -329,13 +334,16 @@ export default function GADiabetes() {
             </Grid.Column>
           </Grid.Row>
           <Divider/>
-          <Grid.Row columns={2}>
-            <Grid.Column width={8} textAlign="center">
+          <Grid.Row columns={2} style={{ display: Warning ? "none" : "block" }}>
+            <Grid.Column width={8} textAlign="center">  
               <DataPanel />
             </Grid.Column>
             <Grid.Column width={8} textAlign="center">
               <MapPanel />
             </Grid.Column>
+          </Grid.Row>
+          <Grid.Row style={{ display: Warning ? "block" : "none", textAlign:"center", color:"red", fontSize: "1.5em",paddingTop:'2em'}}>
+            <Grid.Column>Warning: Please visit this page in a larger browser</Grid.Column>
           </Grid.Row>
         </Grid>
       </Container>

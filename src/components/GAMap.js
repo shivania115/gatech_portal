@@ -44,11 +44,11 @@ export default function GAMap(props) {
     });
     setMapColor(scaleMap);
     setLegendSplit(scaler.quantiles());
-    console.log("sm",scaleMap);
+    //console.log("sm",scaleMap);
   },[selectedVariable,firstRender]);
 
-  console.log(fetchedData);
-  console.log(mapColor);
+  //console.log(fetchedData);
+  //console.log(mapColor);
 
 
   const Legend = () => {
