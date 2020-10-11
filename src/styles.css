@@ -48,3 +48,12 @@
 }
 
 /* https://github.com/Semantic-Org/Semantic-UI-CSS/blob/master/components/menu.css */
+
+
+.MuiAlert-message {
+  font-size: 1rem;
+}
+
+#tooltip{
+  width: 10em,
+}

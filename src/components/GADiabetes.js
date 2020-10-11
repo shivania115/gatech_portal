@@ -9,60 +9,66 @@ import {
   Table,
   Header,
   Divider,
-  List, Segment
+  List,
+  Menu
 } from 'semantic-ui-react'
+import {Alert, AlertTitle} from '@material-ui/lab';
 import {gatech} from '../stitch/mongodb';
-import { Menu,Button } from 'semantic-ui-react'
 import _ from 'lodash';
 import styled from 'styled-components';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import ComposableMap from "./ComposableMap";
 
 
 function DetTable(props){
-  const categories = props.categories;
+  const categories = _.map(props.categories,'cat');
+  const unit = _.map(props.categories,'unit');
+  console.log("unit ",unit);
   const [count,setCount] = useState([]);
   const [stateAvg,setStateAvg] = useState([]);
   const {selectedCounty, 
     selectedTable,
     selectedVariable,
-    firstRender,
+    fetchedData,
     actions: {handlePageStateChange}} = useGADM();
-  const {isLoggedIn} = useStitchAuth();
 
+  const GetValue = () => {
 
-  const GetValue = async()=> {
-
-    const query = {"subgroup":selectedTable.qryName};
-    const prom = await gatech.find(query,{projection:{"subsubgroup":1,"value":1,"county":1}}).toArray();
-
-    //console.log(Object.keys(prom[0])[1])
-
+    const prom = fetchedData;
     //county stats
-    var countArray = _.sortBy(_.filter(prom,['county',selectedCounty.NAME+" County"]),['subsubgroup']);
+    var countArray = _.sortBy(_.filter(_.reject(fetchedData,['subsubgroup','% Diabetes in Medicaid Population']),{'subgroup': selectedTable.qryName,'county': selectedCounty.NAME+" County"}),['subsubgroup']);
+    console.log('subGroup', selectedTable.qryName);
+    console.log('county', selectedCounty.NAME+" County");
+    console.log(countArray)
     setCount(countArray);
     
     //state avg stats
-    const byGroup = _.groupBy(prom,'subsubgroup');  // sets of subsubgroup; by table; sorted here i guess
-    handlePageStateChange({fetchedData:byGroup});   //save for map
+    const byGroup = _.groupBy(_.filter(_.reject(fetchedData,['subsubgroup','% Diabetes in Medicaid Population']),{'subgroup': selectedTable.qryName}),'subsubgroup');  // sets of subsubgroup; by table; sorted here i guess
+    console.log("groups ", byGroup);
     var i1;
     var resultArray = [];
     for (i1 in byGroup){   // each subsubgroup,length 159
       var mean = _.meanBy(_.reject(byGroup[i1],['value','N/A']),function(o){return o.value;});
       resultArray.push(mean.toFixed(1));
     }
+    console.log("ave ", resultArray);
     setStateAvg(resultArray);
   };
   
   useEffect(()=>{
-    if (isLoggedIn === true){
       GetValue();
-    }
-  }, [selectedCounty, selectedTable]);
+  }, [selectedCounty, selectedTable, fetchedData]);
 
 
   const zipped = count.map((obj,index) =>{
     var val;   //deal with na
     if (obj.value!== "N/A"){
-      val = obj.value.toFixed(1);
+      var sp = (obj.value + '').split('.');
+      if (sp[1]!==undefined && sp[1].length>2){
+        val = obj.value.toFixed(2);
+      }else{
+        val = obj.value;
+      }
     } else {
       val = obj.value;
     }  
@@ -70,21 +76,16 @@ function DetTable(props){
     <Table.Row key={index}
               onClick={()=>{
                 handlePageStateChange({selectedVariable: {varName:obj.subsubgroup,
-                                                    printName:categories[index]}
-                                                  });}}
+                                                    printName:categories[index],
+                                                    unit: unit[index]},
+                                                    });}}
                 active = {selectedVariable.printName === categories[index]}
                 >
-                  {/* style ={{color: selectedVariable.printName === categories[index] ? 'red':'green'}} */}
       <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"left", paddingLeft:'0.5em'}}>{categories[index]}</Table.Cell>
       <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{val}</Table.Cell>    
       <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{stateAvg[index]}</Table.Cell>            
     </Table.Row>);
   });
-
-  
-  if (firstRender === true){
-    handlePageStateChange({firstRender:false});
-  }
 
 
     return (
@@ -154,65 +155,81 @@ function MenuButton() {
 }                          
 
 function DataPanel() {
+  const {isLoggedIn} = useStitchAuth();
 
   const {selectedTable,
     selectedVariable, 
     selectedCounty, 
+    fetchedData,
     actions: {handlePageStateChange}} = useGADM();
+
+  const fetchData = async()=> {
+    const prom = await gatech.find({},{projection:{"subgroup":1,"subsubgroup":1,"value":1,"county":1}}).toArray();
+    handlePageStateChange({fetchedData:prom});
+    console.log(prom);
+  }
+
+  useEffect(()=>{
+    if (isLoggedIn === true){
+      fetchData();
+    }
+  },[]);
 
 
   const RowCat = () =>{    // determines the printname
     if (selectedTable.tableName==="Demographic Composition") {
-      return(["% of 65 y or older",
-                                    "% Black/African American",
-                                    "% Asian",
-                                    "% Foreign born",
-                                    "% Hispanic",
-                                    "Median age (y)",
-                                    "Total Population, thousands",
-                                    "% Women"]);
+      return([{'cat':"% of 65 y or older", 'unit':'(%)'},
+                                    {'cat':"% Black/African American",'unit':'(%)'},
+                                    {'cat':"% Asian",'unit':'(%)'},
+                                    {'cat':"% Foreign born",'unit':'(%)'},
+                                    {'cat':"% Hispanic",'unit':'(%)'},
+                                    {'cat':"Median age (y)","unit":'(y)'},
+                                    {'cat':"Total Population, thousands", "unit":'(k)'},
+                                    {'cat':"% Women",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Cardiometabolic disease morbidity") {
-      return(["% CHD Prevalence in Medicaid population",
-              "% with Diabetes",
-              "% with Hypertension in Medicaid population",
-              "Newly diagnosed diabetes (new cases per 1,000)",
-              "% Obese"]);
+      return([{'cat':"% CHD Prevalence in Medicaid population",'unit':'(%)'},
+      {'cat':"% with Diabetes",'unit':'(%)'},
+      {'cat':"% with Hypertension in Medicaid population",'unit':'(%)'},
+      {'cat':"Newly diagnosed diabetes (new cases per 1,000)",'unit':'(per k)'},
+      {'cat':"% Obese",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Clinical events") {
-      return(["CVD deaths per 100,000",
-              "CVD hospitalizations per 100,000",
-              "Diabetes deaths per 100,000",
-              "Diabetes hospitalizations per 100,000",
-              "Kidney hospitalizations per 100,000"]);
+      return([{'cat':"CVD deaths per 100,000",'unit':'(per m)'},
+      {'cat':"CVD hospitalizations per 100,000",'unit':'(per m)'},
+      {'cat':"Diabetes deaths per 100,000",'unit':'(per m)'},
+      {'cat':"Diabetes hospitalizations per 100,000",'unit':'(per m)'},
+      {'cat':"Kidney hospitalizations per 100,000",'unit':'(per m)'}]);
     }
     if (selectedTable.qryName==="Lifestyle Related Risk Factors"){
-      return(["% Excessive drinkers",
-              "% Physical inactive",
-              "% Insufficient sleep (<7 hours)",
-              "% Current Smokers"]);
+      return([{'cat':"% Excessive drinkers",'unit':'(%)'},
+      {'cat':"% Physical inactive",'unit':'(%)'},
+      {'cat':"% Insufficient sleep (<7 hours)",'unit':'(%)'},
+      {'cat':"% Current Smokers",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Healthcare"){
-      return(["% Diabetes Screening",
-              "Cardiologists",
-              "Endocrinologists",
-              "Primary care doctors (ratio of population to primary care physicians)",
-              "% Uninsured"]);
+      return([
+        // "% Diabetes Screening",
+        {'cat':"Cardiologists",'unit':''},
+        {'cat':"Endocrinologists",'unit':''},
+        {'cat':"Primary care doctors (ratio of population to primary care physicians)",'unit':''},
+        {'cat':"% Uninsured",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Socioeconomic Factors") {
-      return(["% Graduates high school in 4 years",
-              "% In poverty",
-              "Income Inequality",
-              "Median income ($)",
-              "% Unemployed"]);
+      return([{'cat':"% Graduates high school in 4 years",'unit':'(%)'},
+      {'cat':"% In poverty",'unit':'(%)'},
+      {'cat':"Income Inequality",'unit':''},
+      {'cat':"Median income ($)",'unit':'($)'},
+      {'cat':"% Unemployed",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Environmental Factors") {
-      return(["% Exercise opportunities",
-              "Food environment index",
-              "% Severe housing problems",
-              "Residential segregation score"]);
+      return([{'cat':"% Exercise opportunities",'unit':'(%)'},
+      {'cat':"Food environment index",'unit':''},
+      {'cat':"% Severe housing problems",'unit':'(%)'},
+      {'cat':"Residential segregation score",'unit':''}]);
     }
   }
+
 
   return (
     <Grid>
@@ -273,7 +290,7 @@ function MapPanel() {
               The color shows the distribution of {selectedVariable.printName} across the Georgia counties.
             </Header.Subheader>
           </Header>
-          <Header as='h4' style={{fontWeight: 300, paddingTop:'1.2em', paddingLeft:'4em', paddingBottom:'-1em', textAlign:'left',color:'#da291c'}}>
+          <Header as='h4' style={{fontWeight: 300, paddingTop:'0em', paddingLeft:'4em', paddingBottom:'-1em', textAlign:'left',color:'#da291c'}}>
             <i><b>Select a county to see detailed characteristics</b></i>
           </Header>
         </Grid.Column>
@@ -290,38 +307,43 @@ function MapPanel() {
 
 export default function GADiabetes() {
   const [Warning, setWarning] = useState(false);
+  const [userWidth, setUserWidth] = useState(0);
   
+  let wid = 0;
   useEffect(()=>{
     var d = document, root= d.documentElement, body= d.body;
-    var wid = window.innerWidth || root.clientWidth || body.clientWidth;
+    wid = window.innerWidth || root.clientWidth || body.clientWidth;
+    setUserWidth(wid);
     if (wid<1200){
       setWarning(true);
     }
-  },[]
+  },[userWidth]
   )
+  console.log(userWidth);
+
 
   return (
     <GADMProvider>
       <Container>
         <Grid style={{paddingTop: '2em'}}>
-          <Grid.Row columns={1}
-          style={{ backgroundColor: `#FFFFF`}}>
-            {/* style={{ backgroundImage: `url(${require("../bg2.jpg")})`}} `#d9d9d6`*/}
+          <Grid.Row centered columns={1}
+          style={{ background: 'linear-gradient(to bottom, #0c2340, #012169)'}}>
+            {/* style={{ backgroundImage: `url(${require("../bg2.jpg")})`}} `#d9d9d6` backgroundColor: `#012169`*/}
             <Grid.Column textAlign="center">
-              <Header as='h1' style={{fontWeight: 300,color:'black'}}>
+              <Header as='h1' style={{fontWeight: 500,color:'whitesmoke'}}>
                 Georgia Diabetes Data Portal
-                <Header.Subheader style={{fontWeight: 300,color:'black'}}>
+                <Header.Subheader style={{fontWeight: 300,color:'whitesmoke'}}>
                   Interactive Dashboard of Diabetes-Related Health Determinants
                 </Header.Subheader>
               </Header>
               {/* <Header as='h4' style={{fontWeight: 300}}>
                 A Quick User Guide
               </Header> */}
-              <List bulleted style={{fontWeight: 300, color:'black'}} size="mini">
-                <List.Item>
+              <List bulleted style={{fontWeight: 300, color:'whitesmoke'}} size="mini">
+                {/* <List.Item>
                   Click on a category in the menu to see the <br/>
                   characteristics under each category in the table.
-                </List.Item>
+                </List.Item> */}
                 <List.Item>
                   Click on a Characteristic on the table located <i>on the left</i> <br/>
                   to see the county-level distribution on the map <i>on the right</i>.
@@ -333,8 +355,8 @@ export default function GADiabetes() {
               </List>
             </Grid.Column>
           </Grid.Row>
-          <Divider/>
-          <Grid.Row columns={2} style={{ display: Warning ? "none" : "block" }}>
+          {/* <Divider/> */}
+          <Grid.Row centered columns={2} style={{ display: Warning ? "none" : "block", paddingTop:'4em' }}>
             <Grid.Column width={8} textAlign="center">  
               <DataPanel />
             </Grid.Column>
@@ -342,8 +364,19 @@ export default function GADiabetes() {
               <MapPanel />
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row style={{ display: Warning ? "block" : "none", textAlign:"center", color:"red", fontSize: "1.5em",paddingTop:'2em'}}>
-            <Grid.Column>Warning: Please visit this page in a larger browser</Grid.Column>
+          <Grid.Row style={{ display: Warning ? "block" : "none", textAlign:"left", color:"red", paddingTop:'4em',paddingLeft:'2em'}}>
+            <Grid.Column>
+              {/* <List>
+                <List.Item>Warning</List.Item>
+                <List.Item style={{fontSize:'0.8em'}}>Please expand your browser window and refresh the page to view the content.</List.Item>
+                <List.Item style={{fontSize:'0.8em'}}>If you are using a mobile device, please use a PC to visit this page.</List.Item>
+              </List> */}
+              <Alert severity="error">
+                <AlertTitle style={{fontSize: '1.3rem'}}>Warning</AlertTitle>
+                Please expand your browser window and refresh the page to view the content.
+                If you are using a mobile device, please use a PC to visit this page.
+              </Alert>
+              </Grid.Column>
           </Grid.Row>
         </Grid>
       </Container>
