@@ -26,14 +26,33 @@ export default function GAMap(props) {
     selectedCounty, 
     fetchedData,
     actions: {handlePageStateChange}} = useGADM();
+  // const colorPalette = [
+  //   "#D8E7E9",
+  //   "#A4C8CB",
+  //   "#71A8AD", 
+  //   "#4A7C82",
+  //   "#34575B",
+  //   "#253E41"
+  // ];
+
+  // const colorPalette = [
+  //   "#deebf7",
+  //   "#c6dbef",
+  //   "#9ecae1",
+  //   "#6baed6",
+  //   "#3182bd",
+  //   "#08519c"
+  //   ];
+
   const colorPalette = [
-    "#D8E7E9",
-    "#A4C8CB",
-    "#71A8AD", 
-    "#4A7C82",
-    "#34575B",
-    "#253E41"
-  ];
+    "#D4E5F7",
+    "#85B2E0",
+    "#407FBF",
+    "#2966A3",
+    "#174C82",
+    "#0A335C"
+    ];
+
   const [mapColor, setMapColor] = useState(0);
   const [legendSplit, setLegendSplit] = useState([]);
   const [legendMin, setLegendMin] = useState();
