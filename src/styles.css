@@ -57,3 +57,43 @@
 #tooltip{
   width: 10em,
 }
+
+.ui.item.left.pointing.dropdown[active="true"]{
+  font-weight: 600;
+  color: whitesmoke;
+  background-color: #012169 !important;
+  border-top-left-radius: 5px !important;
+  border-bottom-left-radius: 5px !important;
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+  border: 0rem !important;
+}
+
+.ui.vertical.menu .active.item{
+  font-weight: 600;
+  color: whitesmoke;
+  background-color: #012169 !important;
+  border-top-left-radius: 5px !important;
+  border-bottom-left-radius: 5px !important;
+  border: 0rem !important;
+}
+
+.ui.menu .ui.dropdown .menu>.active.item{
+  font-weight: 600;
+  color: whitesmoke !important;
+  background-color: #b58500 !important;
+  border-radius: 5px !important;
+}
+
+.ui.dropdown{
+  z-index: 1;
+}
+
+.dropdown.icon{
+  position: absolute !important;
+  vertical-align: middle !important;
+  top: 1.4rem;
+  right: 0.6rem;
+  z-index: 100;
+  float: right;
+}

@@ -1,23 +1,27 @@
 self.__precacheManifest = [
   {
-    "revision": "5e57a68e4874bc4fa2cd",
-    "url": "/gatech_portal/static/css/main.7a58338d.chunk.css"
+    "revision": "bf0d8950769d8aa0bac3",
+    "url": "/gatech_portal/static/css/main.d957b437.chunk.css"
   },
   {
-    "revision": "5e57a68e4874bc4fa2cd",
-    "url": "/gatech_portal/static/js/main.73bcdb32.chunk.js"
+    "revision": "bf0d8950769d8aa0bac3",
+    "url": "/gatech_portal/static/js/main.90b18f94.chunk.js"
   },
   {
     "revision": "2069c063a8ec61de4959",
     "url": "/gatech_portal/static/js/runtime~main.23111b35.js"
   },
   {
-    "revision": "b994e90d3f4c9211b5c0",
+    "revision": "2f155bebc042d1754dca",
     "url": "/gatech_portal/static/css/2.65e2783b.chunk.css"
   },
   {
-    "revision": "b994e90d3f4c9211b5c0",
-    "url": "/gatech_portal/static/js/2.406cfa29.chunk.js"
+    "revision": "2f155bebc042d1754dca",
+    "url": "/gatech_portal/static/js/2.f17acbd6.chunk.js"
+  },
+  {
+    "revision": "9c74e172f87984c48ddf5c8108cabe67",
+    "url": "/gatech_portal/static/media/flags.9c74e172.png"
   },
   {
     "revision": "8e3c7f5520f5ae906c6cf6d7f3ddcd19",
@@ -60,12 +64,12 @@ self.__precacheManifest = [
     "url": "/gatech_portal/static/media/outline-icons.82f60bd0.svg"
   },
   {
-    "revision": "13db00b7a34fee4d819ab7f9838cc428",
-    "url": "/gatech_portal/static/media/brand-icons.13db00b7.eot"
-  },
-  {
     "revision": "e8c322de9658cbeb8a774b6624167c2c",
     "url": "/gatech_portal/static/media/brand-icons.e8c322de.woff2"
+  },
+  {
+    "revision": "13db00b7a34fee4d819ab7f9838cc428",
+    "url": "/gatech_portal/static/media/brand-icons.13db00b7.eot"
   },
   {
     "revision": "a046592bac8f2fd96e994733faf3858c",
@@ -76,15 +80,11 @@ self.__precacheManifest = [
     "url": "/gatech_portal/static/media/brand-icons.c5ebe0b3.ttf"
   },
   {
-    "revision": "9c74e172f87984c48ddf5c8108cabe67",
-    "url": "/gatech_portal/static/media/flags.9c74e172.png"
-  },
-  {
     "revision": "a1a749e89f578a49306ec2b055c073da",
     "url": "/gatech_portal/static/media/brand-icons.a1a749e8.svg"
   },
   {
-    "revision": "03bee0f0860344692199723b25b19b39",
+    "revision": "13a27ab56195e63673f1bb948561dada",
     "url": "/gatech_portal/index.html"
   }
 ];

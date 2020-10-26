@@ -17,10 +17,7 @@ const geoUrl ="https://raw.githubusercontent.com/deldersveld/topojson/master/cou
 export default function GAMap(props) {
   const [hover, setHover] = useState(0);
   const [hoverCounty, setHoverCounty] = useState("Fulton County");
-  console.log("init county",hoverCounty)
   const [toolTipVal, setToolTipVal] = useState(10.4);    // does not show variable
-  //useEffect(()=>{setToolTipVal(10.4)},[]);
-  console.log("init val ",toolTipVal);
   const {selectedVariable, 
     selectedTable,
     selectedCounty, 
@@ -61,11 +58,7 @@ export default function GAMap(props) {
   
   useEffect(()=>{
     var statedata = _.filter(fetchedData, {'subsubgroup': selectedVariable.varName});
-    console.log("var ", selectedVariable.varName);
-    console.log("fetched ", fetchedData);
-    console.log("state ", statedata);
     var varData = _.map(statedata,'value');
-    console.log("var data ", varData);
     varData = varData.filter((number)=> number!=='N/A');
     setLegendMin(Math.min(...varData).toFixed(1));
     setLegendMax(Math.max(...varData).toFixed(1));
@@ -76,15 +69,33 @@ export default function GAMap(props) {
     });
     setMapColor(scaleMap);
     setLegendSplit(scaler.quantiles());
-    console.log("sm",scaleMap);
   },[selectedVariable, fetchedData]);
 
 
 
   const Legend = () => {
+    let MinVal;
+    let MaxVal;
+
+      if(legendMin>999999){
+        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000000).toFixed(1) + "M"} </text>;
+      }else if(legendMin>999){
+        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000).toFixed(1) + "K"} </text>;
+      }else{
+        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{legendMin}</text>;
+      }
+  
+      if(legendMax>999999){
+        MaxVal = <text x={182} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000000).toFixed(1) + "M"} </text>;
+      }else if(legendMax>999){
+        MaxVal = <text x={182} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000).toFixed(1) + "K"} </text>;
+      }else{
+        MaxVal = <text x={182} y={35} style={{fontSize: '0.7em'}}>{legendMax}</text>;
+      }
+
     if (Object.keys(mapColor).length>0) {
       return (
-      <svg width="280" height="80" transform="translate(-20,-10)"> 
+      <svg width="280" height="80" transform="translate(-10,-20)"> 
       {/* transform="translate(-20,-60) */}
         {_.map(legendSplit, (splitpoint, i) => {
           if(legendSplit[i] < 1){
@@ -95,9 +106,13 @@ export default function GAMap(props) {
             return <text key = {i} x={64 + 24 * (i)} y={35} style={{fontSize: '0.6em'}}> {(legendSplit[i]/1000).toFixed(1) + "K"}</text>                    
           }
           return <text key = {i} x={64 + 24 * (i)} y={35} style={{fontSize: '0.6em'}}> {legendSplit[i].toFixed(1)}</text>                    
-        })} 
-        <text x={40} y={35} style={{fontSize: '0.7em'}}>{legendMin}</text>
-        <text x={182} y={35} style={{fontSize: '0.7em'}}>{legendMax}</text>
+        })}
+
+      {MinVal}
+      {MaxVal}
+        
+        {/* <text x={40} y={35} style={{fontSize: '0.7em'}}>{legendMin}</text>
+        <text x={182} y={35} style={{fontSize: '0.7em'}}>{legendMax}</text> */}
         {_.map(colorPalette, (color, i) => {
           return <rect key={i} x={50+24*i} y={40} width="22" height="20" style={{fill: color, strokeWidth:1, stroke: color}}/>                    
         })} 
@@ -119,7 +134,7 @@ export default function GAMap(props) {
       height: 50,
       position: 'fixed',
       top: '10px',
-      left: '-130px',
+      left: '-135px',
       fontSize: '0.85rem',
       padding: '0.7em'
     },
@@ -135,7 +150,6 @@ export default function GAMap(props) {
         ttval = parseFloat(ttval).toFixed(2);
       }
     }
-    console.log("filtered", ttval);
     setToolTipVal(ttval);
   },[hoverCounty, fetchedData, selectedVariable]);
 
@@ -158,14 +172,14 @@ export default function GAMap(props) {
           //projection="geoAlbersUsa" 
           projection="geoTransverseMercator"
           data-tip=""
-          width={760} 
+          width={560} 
           height={530}
           strokeWidth= {0.5}
           stroke= 'black'
-          projectionConfig={{scale: 6000}}
+          projectionConfig={{scale: 5500}}
           
            >
-          <Geographies geography={geoUrl} transform="translate(10,0)">
+          <Geographies geography={geoUrl} transform="translate(50,-40)">
             {({ geographies }) => 
               <svg>
                 {geographies.map(geo => (
