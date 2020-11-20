@@ -11,7 +11,8 @@ import {
   Divider,
   List,
   Menu,
-  Dropdown
+  Dropdown,
+  Icon
 } from 'semantic-ui-react'
 import {Alert, AlertTitle} from '@material-ui/lab';
 import {gatech} from '../stitch/mongodb';
@@ -295,7 +296,10 @@ function MenuPanel() {
   
   return (
   <Grid>
-  <Grid.Row style={{paddingTop: '2rem',paddingLeft:'1.5rem', width:'95%', textAlign:'left'}}>
+  <Grid.Row>
+    <Header as='h4' style={{fontWeight: 300, color:'#da291c', paddingLeft:'3em'}}><i><b>Select an indicator</b></i></Header>
+  </Grid.Row>
+  <Grid.Row style={{paddingTop: '0rem',paddingLeft:'1.5rem', width:'95%', textAlign:'left'}}>
     <MenuButton/>
   </Grid.Row>
   </Grid>
@@ -489,7 +493,7 @@ export default function GADiabetes() {
       <Container>
         <Grid style={{paddingTop: '2em'}}>
           <Grid.Row centered columns={1}
-          style={{ background: 'linear-gradient(to bottom, #0c2340, #012169)'}}>
+          style={{ background: 'linear-gradient(to bottom, #0c2340, #012169)', height: '6rem'}}>
             {/* style={{ backgroundImage: `url(${require("../bg2.jpg")})`}} `#d9d9d6` backgroundColor: `#012169`*/}
             <Grid.Column textAlign="center">
               <Header as='h1' style={{fontWeight: 500,color:'whitesmoke'}}>
@@ -498,27 +502,24 @@ export default function GADiabetes() {
                   Interactive Dashboard of Diabetes-Related Health Determinants
                 </Header.Subheader>
               </Header>
-              {/* <Header as='h4' style={{fontWeight: 300}}>
-                A Quick User Guide
-              </Header> */}
-              <List bulleted style={{fontWeight: 300, color:'whitesmoke'}} size="mini">
-                {/* <List.Item>
-                  Click on a category in the menu to see the <br/>
-                  characteristics under each category in the table.
-                </List.Item> */}
-                <List.Item>
-                  Click on a Characteristic on the table located <i>on the left</i> <br/>
-                  to see the county-level distribution on the map <i>on the right</i>.
-                </List.Item>
-                <List.Item>
-                  Click on a county on the map located <i>on the right</i> <br/>
-                  to see its full characteristics on the table <i>on the left</i>.
-                </List.Item>                
-              </List>
             </Grid.Column>
           </Grid.Row>
-          {/* <Divider/> */}
-          <Grid.Row centered columns={3} style={{ display: Warning ? "none" : "block", paddingTop:'4em' }}>
+          <Grid.Row>
+              <Header as='h4' style={{fontWeight: 600, paddingLeft: '5rem', paddingTop: '1rem'}}>
+                A Quick User Guide:
+              </Header>
+              <List style={{fontWeight: 400, color:'black', paddingTop: '2rem'}} size="small">   
+              {/* bulleted */}
+                {/* <List.Item> */}
+                  <Icon name='hand point right outline' /> Click on a characteristic on the table located <i>on the right</i> to see the county-level distribution on the map <i>on the left</i>. <br />
+                {/* </List.Item> */}
+                {/* <List.Item> */}
+                  <Icon name='hand point right outline' /> Click on a county on the map located <i>on the left</i> to see its full characteristics on the table <i>on the right</i>.
+                {/* </List.Item>                 */}
+              </List>
+          </Grid.Row>
+          <Divider/>
+          <Grid.Row centered columns={3} style={{ display: Warning ? "none" : "block", paddingTop:'2em' }}>
             <Grid.Column width={3} textAlign="center">  
               <MenuPanel />
             </Grid.Column>
