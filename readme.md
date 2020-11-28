@@ -1,6 +1,10 @@
 # Georgia Diabetes Data Portal
 
-This project is built upon the following Stitch Example - Todo App, with GA map added to the page.
+This data portal is built to present county-level diabetes-related data in Georgia. The table contains the values of the charateristics for a county, and the heatmap shows the distribution of each charateristic.
+
+The published version is at https://sklisa.github.io/gatech_portal/.
+
+The project is built upon the following Stitch Example - Todo App, with GA map added to the page.
 
 Stitch Example - Todo App
 
