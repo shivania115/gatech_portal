@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "ab4c3223f0dadfa9af14",
+    "revision": "ae1534e7802d80d777c0",
     "url": "/gatech_portal/static/css/main.d957b437.chunk.css"
   },
   {
-    "revision": "ab4c3223f0dadfa9af14",
-    "url": "/gatech_portal/static/js/main.a27433fb.chunk.js"
+    "revision": "ae1534e7802d80d777c0",
+    "url": "/gatech_portal/static/js/main.53429943.chunk.js"
   },
   {
     "revision": "2069c063a8ec61de4959",
@@ -40,12 +40,12 @@ self.__precacheManifest = [
     "url": "/gatech_portal/static/media/icons.b87b9ba5.ttf"
   },
   {
-    "revision": "701ae6abd4719e9c2ada3535a497b341",
-    "url": "/gatech_portal/static/media/outline-icons.701ae6ab.eot"
-  },
-  {
     "revision": "cd6c777f1945164224dee082abaea03a",
     "url": "/gatech_portal/static/media/outline-icons.cd6c777f.woff2"
+  },
+  {
+    "revision": "701ae6abd4719e9c2ada3535a497b341",
+    "url": "/gatech_portal/static/media/outline-icons.701ae6ab.eot"
   },
   {
     "revision": "ef60a4f6c25ef7f39f2d25a748dbecfe",
@@ -84,7 +84,7 @@ self.__precacheManifest = [
     "url": "/gatech_portal/static/media/brand-icons.a1a749e8.svg"
   },
   {
-    "revision": "a6c68f5f24d6419a61b4c4bf5337ae79",
+    "revision": "ad808e53b593fea1dd8f4a520c797100",
     "url": "/gatech_portal/index.html"
   }
 ];
