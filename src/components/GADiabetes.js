@@ -1,8 +1,8 @@
 // React
 import React, {useEffect, useState} from "react";
 import GAMap from "./GAMap";
-import {GADMProvider, useGADM} from './GADMProvider';
-import { useStitchAuth } from "./StitchAuth";
+import { GADMProvider, useGADM } from './GADMProvider';
+import { useStitchAuth,StitchAuthProvider } from "./StitchAuth";
 import { 
   Container, 
   Grid, 
@@ -293,21 +293,22 @@ function MenuButton() {
 }
 
 function MenuPanel() {
+  const {fetchedData} = useGADM()
   
+  if(fetchedData){
   return (
   <Grid>
   <Grid.Row>
-    <Header as='h4' style={{fontWeight: 300, color:'#da291c', paddingLeft:'3em'}}><i><b>Select an indicator</b></i></Header>
+    <Header as='h4' style={{fontWeight: 300, color:'#da291c', paddingLeft:'3em', paddingTop: '0.1rem'}}><i><b>Select an indicator</b></i></Header>
   </Grid.Row>
-  <Grid.Row style={{paddingTop: '0rem',paddingLeft:'1.5rem', width:'95%', textAlign:'left'}}>
+  <Grid.Row style={{paddingTop: '0.5rem',paddingLeft:'1.5rem', width:'95%', textAlign:'left', display: fetchedData!='undefined' ? "block": "none"}}>
     <MenuButton/>
   </Grid.Row>
   </Grid>
-  )
+  )}
 }
 
 function DataPanel() {
-  const {isLoggedIn} = useStitchAuth();
   const [desc,setDesc] = useState();
   const [source,setSource] = useState();
 
@@ -317,6 +318,11 @@ function DataPanel() {
     fetchedData,
     actions: {handlePageStateChange}} = useGADM();
 
+  const {
+    isLoggedIn,
+    actions: { handleAnonymousLogin },
+  } = useStitchAuth();
+
   const fetchData = async()=> {
     const prom = await gatech.find({},{projection:{"subgroup":1,"subsubgroup":1,"value":1,"county":1,"desc":1,"source":1}}).toArray();
     handlePageStateChange({fetchedData:prom});
@@ -325,8 +331,10 @@ function DataPanel() {
   useEffect(()=>{
     if (isLoggedIn === true){
       fetchData();
+    } else {
+      handleAnonymousLogin();
     }
-  },[]);
+  },[isLoggedIn]);
 
   useEffect(()=>{
     var desc = _.map(_.filter(fetchedData,{'subsubgroup':selectedVariable.varName,'county':'Fulton County'}),'desc');
@@ -390,7 +398,7 @@ function DataPanel() {
     }
   }
 
-
+  if(fetchedData){
   return (
     <Grid>
       <Grid.Row>
@@ -438,14 +446,16 @@ function DataPanel() {
         </Grid.Column>
       </Grid.Row>
     </Grid>
-  );
+  );}
 }
 
 function MapPanel() {
   const {selectedVariable, 
     selectedCounty, 
+    fetchedData,
     actions: {handlePageStateChange}} = useGADM();
 
+if(fetchedData){
   return (
     <Grid>
       <Grid.Row>
@@ -467,7 +477,7 @@ function MapPanel() {
         </Grid.Column>
       </Grid.Row>
     </Grid>
-    );
+    );}
 
 }
 

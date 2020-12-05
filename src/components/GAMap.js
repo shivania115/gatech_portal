@@ -124,7 +124,7 @@ export default function GAMap(props) {
         <text x={245} y={58} style={{fontSize: '0.7em'}}> Reported </text>
       </svg>);
     } else {
-      return ;
+      return;
     }
   };
 
@@ -153,8 +153,8 @@ export default function GAMap(props) {
     setToolTipVal(ttval);
   },[hoverCounty, fetchedData, selectedVariable]);
 
-
-  return (
+  if (fetchedData) {
+    return (
       <div>  
         <div>
           {Legend()}
@@ -166,7 +166,6 @@ export default function GAMap(props) {
               County stat: {toolTipVal}
             </p>
         }>
-        {/* open={hover>0} */}
         <div>
         <ComposableMap 
           //projection="geoAlbersUsa" 
@@ -180,7 +179,8 @@ export default function GAMap(props) {
           
            >
           <Geographies geography={geoUrl} transform="translate(50,-40)">
-            {({ geographies }) => 
+            { 
+            ({ geographies }) => 
               <svg>
                 {geographies.map(geo => (
                   <Geography
@@ -202,19 +202,14 @@ export default function GAMap(props) {
                     strokeWidth = {selectedCounty.GEOID===geo.properties.GEOID ? 3.5:0.5}
                     stroke = {selectedCounty.GEOID===geo.properties.GEOID ? '#da291c':'black'}
                   />
-                ))}
+                )) }
               </svg>
             }
           </Geographies>
         </ComposableMap>
         </div>
         </Tooltip>
-        {/* <ReactTooltip place='right' style={{position:'absolute'}} data-offset="{'top': 100, 'left': 100}"> 
-          <p>{hoverCounty}</p>
-        </ ReactTooltip>  */}
-        {/* <div>
-          {Legend()}
-        </div> */}
       </div>
       );
+  }
 }

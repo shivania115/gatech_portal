@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/gatech_portal/precache-manifest.2a0aa6357a7bbab8e86e69c9a3e84551.js"
+  "/gatech_portal/precache-manifest.54f87cf8fcf23edd2f7b14e2367150b0.js"
 );
 
 workbox.clientsClaim();
