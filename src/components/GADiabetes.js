@@ -58,13 +58,20 @@ function DetTable(props){
       GetValue();
   }, [selectedCounty, selectedTable, fetchedData]);
 
+  function numberWithCommas(x) {
+    x = x.toString();
+    var pattern = /(-?\d+)(\d{3})/;
+    while (pattern.test(x))
+        x = x.replace(pattern, "$1,$2");
+    return x;
+  } 
 
   const zipped = count.map((obj,index) =>{
     var val;   //deal with na
     if (obj.value!== "N/A"){
       var sp = (obj.value + '').split('.');
       if (sp[1]!==undefined && sp[1].length>2){
-        val = obj.value.toFixed(2);
+        val = obj.value.toFixed(1);
       }else{
         val = obj.value;
       }
@@ -81,8 +88,8 @@ function DetTable(props){
                 active = {selectedVariable.printName === categories[index]}
                 >
       <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"left", paddingLeft:'0.5em'}}>{categories[index]}</Table.Cell>
-      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{val}</Table.Cell>    
-      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{stateAvg[index]}</Table.Cell>            
+      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{numberWithCommas(val)}</Table.Cell>    
+      <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{numberWithCommas(stateAvg[index])}</Table.Cell>            
     </Table.Row>);
   });
 
@@ -100,7 +107,7 @@ function MenuButton() {
         actions: {handlePageStateChange}} = useGADM();
   const getOptions = (tableName) =>{    // determines the printname
     if (tableName==="Demographic Composition") {
-      return([{key:1, text:"% of 65 y or older", value:"65 yrs or older"},
+      return([{key:1, text:"% 65 y or older", value:"65 yrs or older"},
                                     {key:2, text:"% Black/African American",value:"Black"},
                                     {key:3, text:"% Asian",value:3},
                                     {key:4, text:"% Foreign born",value:4},
@@ -161,7 +168,7 @@ function MenuButton() {
   
   const RowCat = () =>{    // determines the printname
     if (selectedTable.tableName==="Demographic Composition") {
-      return([{'cat':"% of 65 y or older", 'unit':'(%)'},
+      return([{'cat':"% 65 years and older", 'unit':'(%)'},
                                     {'cat':"% Black/African American",'unit':'(%)'},
                                     {'cat':"% Asian",'unit':'(%)'},
                                     {'cat':"% Foreign born",'unit':'(%)'},
@@ -172,8 +179,8 @@ function MenuButton() {
     }
     if (selectedTable.qryName==="Cardiometabolic disease morbidity") {
       return([{'cat':"% CHD Prevalence in Medicaid population",'unit':'(%)'},
-      {'cat':"% with Diabetes",'unit':'(%)'},
-      {'cat':"% with Hypertension in Medicaid population",'unit':'(%)'},
+      {'cat':"% Diabetes",'unit':'(%)'},
+      {'cat':"% Hypertension in Medicaid population",'unit':'(%)'},
       {'cat':"Newly diagnosed diabetes (new cases per 1,000)",'unit':'(per K)'},
       {'cat':"% Obese",'unit':'(%)'}]);
     }
@@ -202,7 +209,7 @@ function MenuButton() {
       return([{'cat':"% Graduates high school in 4 years",'unit':'(%)'},
       {'cat':"% In poverty",'unit':'(%)'},
       {'cat':"Income Inequality",'unit':''},
-      {'cat':"Median income ($)",'unit':'($)'},
+      {'cat':"Median income ($)",'unit':'$'},
       {'cat':"% Unemployed",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Environmental Factors") {
@@ -346,7 +353,7 @@ function DataPanel() {
 
   const RowCat = () =>{    // determines the printname
     if (selectedTable.tableName==="Demographic Composition") {
-      return([{'cat':"% of 65 y or older", 'unit':'(%)'},
+      return([{'cat':"% 65 years and older", 'unit':'(%)'},
                                     {'cat':"% Black/African American",'unit':'(%)'},
                                     {'cat':"% Asian",'unit':'(%)'},
                                     {'cat':"% Foreign born",'unit':'(%)'},
@@ -357,8 +364,8 @@ function DataPanel() {
     }
     if (selectedTable.qryName==="Cardiometabolic disease morbidity") {
       return([{'cat':"% CHD Prevalence in Medicaid population",'unit':'(%)'},
-      {'cat':"% with Diabetes",'unit':'(%)'},
-      {'cat':"% with Hypertension in Medicaid population",'unit':'(%)'},
+      {'cat':"% Diabetes",'unit':'(%)'},
+      {'cat':"% Hypertension in Medicaid population",'unit':'(%)'},
       {'cat':"Newly diagnosed diabetes (new cases per 1,000)",'unit':'(per K)'},
       {'cat':"% Obese",'unit':'(%)'}]);
     }
@@ -387,7 +394,7 @@ function DataPanel() {
       return([{'cat':"% Graduates high school in 4 years",'unit':'(%)'},
       {'cat':"% In poverty",'unit':'(%)'},
       {'cat':"Income Inequality",'unit':''},
-      {'cat':"Median income ($)",'unit':'($)'},
+      {'cat':"Median income ($)",'unit':'$'},
       {'cat':"% Unemployed",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Environmental Factors") {
@@ -431,8 +438,8 @@ function DataPanel() {
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'50%'}}>Characteristic</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'27%', paddingLeft:'0',paddingRight:'0'}}>County Stat</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'25%'}}>State Mean</Table.HeaderCell>                                
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'27%', paddingLeft:'0',paddingRight:'0'}}>County</Table.HeaderCell>
+                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'25%'}}>State</Table.HeaderCell>                                
               </Table.Row>
             </Table.Header>
             <DetTable categories={RowCat()} />
@@ -514,20 +521,20 @@ export default function GADiabetes() {
               </Header>
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row>
-              <Header as='h4' style={{fontWeight: 600, paddingLeft: '5rem', paddingTop: '1rem'}}>
+          {/* <Grid.Row> */}
+              {/* <Header as='h4' style={{fontWeight: 600, paddingLeft: '5rem', paddingTop: '1rem'}}>
                 A Quick User Guide:
-              </Header>
-              <List style={{fontWeight: 400, color:'black', paddingTop: '2rem'}} size="small">   
+              </Header> */}
+              {/* <List style={{fontWeight: 400, color:'black', paddingTop: '2rem'}} size="small">    */}
               {/* bulleted */}
                 {/* <List.Item> */}
-                  <Icon name='hand point right outline' /> Click on a characteristic on the table located <i>on the right</i> to see the county-level distribution on the map <i>on the left</i>. <br />
+                  {/* <Icon name='hand point right outline' /> Click on a characteristic on the table located <i>on the right</i> to see the county-level distribution on the map <i>on the left</i>. <br /> */}
                 {/* </List.Item> */}
                 {/* <List.Item> */}
-                  <Icon name='hand point right outline' /> Click on a county on the map located <i>on the left</i> to see its full characteristics on the table <i>on the right</i>.
-                {/* </List.Item>                 */}
-              </List>
-          </Grid.Row>
+                  {/* <Icon name='hand point right outline' /> Click on a county on the map located <i>on the left</i> to see its full characteristics on the table <i>on the right</i>. */}
+                {/* </List.Item> */}
+              {/* </List> */}
+          {/* </Grid.Row> */}
           <Divider/>
           <Grid.Row centered columns={3} style={{ display: Warning ? "none" : "block", paddingTop:'2em' }}>
             <Grid.Column width={3} textAlign="center">  
@@ -542,11 +549,6 @@ export default function GADiabetes() {
           </Grid.Row>
           <Grid.Row style={{ display: Warning ? "block" : "none", textAlign:"left", color:"red", paddingTop:'4em',paddingLeft:'2em'}}>
             <Grid.Column>
-              {/* <List>
-                <List.Item>Warning</List.Item>
-                <List.Item style={{fontSize:'0.8em'}}>Please expand your browser window and refresh the page to view the content.</List.Item>
-                <List.Item style={{fontSize:'0.8em'}}>If you are using a mobile device, please use a PC to visit this page.</List.Item>
-              </List> */}
               <Alert severity="error">
                 <AlertTitle style={{fontSize: '1.3rem'}}>Warning</AlertTitle>
                 Please expand your browser window and refresh the page to view the content.

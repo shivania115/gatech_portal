@@ -42,13 +42,15 @@ export default function GAMap(props) {
   //   ];
 
   const colorPalette = [
-    "#D4E5F7",
+    "#cbdcf1",
     "#85B2E0",
-    "#407FBF",
+    // "#407FBF",
     "#2966A3",
-    "#174C82",
+    // "#174C82",
     "#0A335C"
     ];
+
+
 
   const [mapColor, setMapColor] = useState(0);
   const [legendSplit, setLegendSplit] = useState([]);
@@ -62,13 +64,32 @@ export default function GAMap(props) {
     varData = varData.filter((number)=> number!=='N/A');
     setLegendMin(Math.min(...varData).toFixed(1));
     setLegendMax(Math.max(...varData).toFixed(1));
-    const scaler = scaleQuantile().domain(varData).range(colorPalette);
+    var scaler = scaleQuantile().domain(varData).range(colorPalette);
     let scaleMap = {};
-    _.forEach(statedata, item => {
-      scaleMap[item.county] = scaler(item.value)
-    });
+
+    if (selectedVariable.varName === 'Cardiologists' || selectedVariable.varName === 'Endocrinologists'){
+      _.forEach(statedata, item => {
+        if (item.value == 0){
+          scaleMap[item.county] = '#D4E5F7'
+        } else {
+          varData = varData.filter((number)=> number!=='N/A' && number!==0);
+          scaler = scaleQuantile().domain(varData).range(colorPalette.slice(1,4));
+          scaleMap[item.county] = scaler(item.value)
+          var customeLegendSplit = scaler.quantiles();
+          setLegendSplit([0].concat(customeLegendSplit));
+          console.log("sq ", legendSplit);
+        }
+      });
+    } else {
+      _.forEach(statedata, item => {
+        scaleMap[item.county] = scaler(item.value)
+      });
+      setLegendSplit(scaler.quantiles());
+    }
+
     setMapColor(scaleMap);
-    setLegendSplit(scaler.quantiles());
+    console.log(scaler);
+    console.log("sqr ", legendSplit);
   },[selectedVariable, fetchedData]);
 
 
@@ -78,25 +99,49 @@ export default function GAMap(props) {
     let MaxVal;
 
       if(legendMin>999999){
-        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000000).toFixed(1) + "M"} </text>;
+        MinVal = <text x={37} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000000).toFixed(1) + "M"} </text>;
       }else if(legendMin>999){
-        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000).toFixed(1) + "K"} </text>;
+        MinVal = <text x={37} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000).toFixed(1) + "K"} </text>;
       }else{
-        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{legendMin}</text>;
+        MinVal = <text x={37} y={35} style={{fontSize: '0.7em'}}>{legendMin}</text>;
       }
   
       if(legendMax>999999){
-        MaxVal = <text x={182} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000000).toFixed(1) + "M"} </text>;
+        MaxVal = <text x={80+20 * (colorPalette.length - 1)} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000000).toFixed(1) + "M"} </text>;
       }else if(legendMax>999){
-        MaxVal = <text x={182} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000).toFixed(1) + "K"} </text>;
+        MaxVal = <text x={80+20 * (colorPalette.length - 1)} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000).toFixed(1) + "K"} </text>;
       }else{
-        MaxVal = <text x={182} y={35} style={{fontSize: '0.7em'}}>{legendMax}</text>;
+        MaxVal = <text x={80+20 * (colorPalette.length - 1)} y={35} style={{fontSize: '0.7em'}}>{legendMax}</text>;
       }
 
-    if (Object.keys(mapColor).length>0) {
+      if(legendMin>999 && legendMax<999999){
+        MinVal = <text x={40} y={35} style={{fontSize: '0.7em'}}>{(legendMin/1000).toFixed(1)} </text>;
+        MaxVal = <text x={80+20 * (colorPalette.length - 1)} y={35} style={{fontSize: '0.7em'}}>{(legendMax/1000).toFixed(1)} </text>;
+      }
+
+    if (Object.keys(mapColor).length>0 && legendMin>999 && legendMax<999999) {    // income
       return (
       <svg width="280" height="80" transform="translate(-10,-20)"> 
-      {/* transform="translate(-20,-60) */}
+        {_.map(legendSplit, (splitpoint, i) => {
+          return <text key = {i} x={64 + 24 * (i)} y={35} style={{fontSize: '0.6em'}}> {(legendSplit[i]/1000).toFixed(1)}</text>                                      
+        })}
+
+      {MinVal}
+      {MaxVal}
+        
+        {_.map(colorPalette, (color, i) => {
+          return <rect key={i} x={50+24*i} y={40} width="22" height="20" style={{fill: color, strokeWidth:1, stroke: color}}/>                    
+        })} 
+        <text x={30} y={74} style={{fontSize: '0.7em'}}>Low (K{selectedVariable.unit})</text>
+        <text x={80+20 * (colorPalette.length - 1)} y={74} style={{fontSize: '0.7em'}}>High (K{selectedVariable.unit})</text>
+
+        <rect x={200} y={40} width="20" height="20" style={{fill: "#FFFFFF", strokeWidth:0.5, stroke: "#000000"}}/>                    
+        <text x={225} y={48} style={{fontSize: '0.7em'}}> None </text>
+        <text x={225} y={58} style={{fontSize: '0.7em'}}> Reported </text>
+      </svg>);
+    } else if (Object.keys(mapColor).length>0) {
+      return (
+      <svg width="280" height="80" transform="translate(-10,-20)"> 
         {_.map(legendSplit, (splitpoint, i) => {
           if(legendSplit[i] < 1){
             return <text key = {i} x={64 + 24 * (i)} y={35} style={{fontSize: '0.6em'}}> {legendSplit[i].toFixed(1)}</text>                    
@@ -111,17 +156,15 @@ export default function GAMap(props) {
       {MinVal}
       {MaxVal}
         
-        {/* <text x={40} y={35} style={{fontSize: '0.7em'}}>{legendMin}</text>
-        <text x={182} y={35} style={{fontSize: '0.7em'}}>{legendMax}</text> */}
         {_.map(colorPalette, (color, i) => {
           return <rect key={i} x={50+24*i} y={40} width="22" height="20" style={{fill: color, strokeWidth:1, stroke: color}}/>                    
         })} 
-        <text x={42} y={74} style={{fontSize: '0.7em'}}>Low {selectedVariable.unit}</text>
+        <text x={30} y={74} style={{fontSize: '0.7em'}}>Low {selectedVariable.unit}</text>
         <text x={80+20 * (colorPalette.length - 1)} y={74} style={{fontSize: '0.7em'}}>High {selectedVariable.unit}</text>
 
-        <rect x={220} y={40} width="20" height="20" style={{fill: "#FFFFFF", strokeWidth:0.5, stroke: "#000000"}}/>                    
-        <text x={245} y={48} style={{fontSize: '0.7em'}}> None </text>
-        <text x={245} y={58} style={{fontSize: '0.7em'}}> Reported </text>
+        <rect x={200} y={40} width="20" height="20" style={{fill: "#FFFFFF", strokeWidth:0.5, stroke: "#000000"}}/>                    
+        <text x={225} y={48} style={{fontSize: '0.7em'}}> None </text>
+        <text x={225} y={58} style={{fontSize: '0.7em'}}> Reported </text>
       </svg>);
     } else {
       return;
@@ -130,13 +173,15 @@ export default function GAMap(props) {
 
   const useStyles = makeStyles((theme) => ({
     customSize: {
-      width: 130,
-      height: 50,
+      width: 120,
+      height: 56,
       position: 'fixed',
       top: '10px',
       left: '-135px',
       fontSize: '0.85rem',
-      padding: '0.7em'
+      padding: '0 0.9rem',
+      display: 'flex',
+      alignItems: 'center'
     },
   }));
 
@@ -147,11 +192,19 @@ export default function GAMap(props) {
     if (ttval!== "N/A"){
       var sp = (ttval + '').split('.');
       if (sp[1]!==undefined && sp[1].length>2){
-        ttval = parseFloat(ttval).toFixed(2);
+        ttval = parseFloat(ttval).toFixed(1);
       }
     }
     setToolTipVal(ttval);
   },[hoverCounty, fetchedData, selectedVariable]);
+
+  function numberWithCommas(x) {
+    x = x.toString();
+    var pattern = /(-?\d+)(\d{3})/;
+    while (pattern.test(x))
+        x = x.replace(pattern, "$1,$2");
+    return x;
+  } 
 
   if (fetchedData) {
     return (
@@ -163,7 +216,7 @@ export default function GAMap(props) {
           title={
             <p>
               {hoverCounty}<br/>
-              County stat: {toolTipVal}
+              Value: {numberWithCommas(toolTipVal)}
             </p>
         }>
         <div>
