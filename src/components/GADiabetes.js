@@ -132,9 +132,9 @@ function MenuButton() {
     }
     if (tableName==="Lifestyle Related Risk Factors"){
       return([{key:1, text:"% Excessive drinkers",value:1},
-      {key:2, text:"% Physical inactive",value:2},
+      {key:2, text:"% Physically inactive",value:2},
       {key:3, text:"% Insufficient sleep (<7 hours)",value:3},
-      {key:4, text:"% Current Smokers",value:4}]);
+      {key:4, text:"% Current smokers",value:4}]);
     }
     if (tableName==="Healthcare"){
       return([
@@ -147,7 +147,7 @@ function MenuButton() {
     if (tableName==="Socioeconomic Factors") {
       return([{key:1, text:"% Graduates high school in 4 years",value:1},
       {key:2, text:"% In poverty",value:2},
-      {key:3, text:"Income Inequality",value:3},
+      {key:3, text:"Income inequality",value:3},
       {key:4, text:"Median income ($)",value:4},
       {key:5, text:"% Unemployed",value:5}]);
     }
@@ -193,9 +193,9 @@ function MenuButton() {
     }
     if (selectedTable.qryName==="Lifestyle Related Risk Factors"){
       return([{'cat':"% Excessive drinkers",'unit':'(%)'},
-      {'cat':"% Physical inactive",'unit':'(%)'},
+      {'cat':"% Physically inactive",'unit':'(%)'},
       {'cat':"% Insufficient sleep (<7 hours)",'unit':'(%)'},
-      {'cat':"% Current Smokers",'unit':'(%)'}]);
+      {'cat':"% Current smokers",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Healthcare"){
       return([
@@ -208,7 +208,7 @@ function MenuButton() {
     if (selectedTable.qryName==="Socioeconomic Factors") {
       return([{'cat':"% Graduates high school in 4 years",'unit':'(%)'},
       {'cat':"% In poverty",'unit':'(%)'},
-      {'cat':"Income Inequality",'unit':''},
+      {'cat':"Income inequality",'unit':''},
       {'cat':"Median income ($)",'unit':'$'},
       {'cat':"% Unemployed",'unit':'(%)'}]);
     }
@@ -269,7 +269,7 @@ function MenuButton() {
             }}>
       <Dropdown.Menu>{item}</Dropdown.Menu>
       </Dropdown>
-      <Dropdown item closeOnBlur openOnFocus={false} pointing='left' closeOnBlur text='Health Care' style={{lineHeight:'2.2em', height: '4rem'}}
+      <Dropdown item closeOnBlur openOnFocus={false} pointing='left' closeOnBlur text='Healthcare' style={{lineHeight:'2.2em', height: '4rem'}}
                 active = {(selectedTable.tableName==='Healthcare').toString()}
                 onClick={()=>{
                       handlePageStateChange({selectedTable: {tableName:'Healthcare',
@@ -378,9 +378,9 @@ function DataPanel() {
     }
     if (selectedTable.qryName==="Lifestyle Related Risk Factors"){
       return([{'cat':"% Excessive drinkers",'unit':'(%)'},
-      {'cat':"% Physical inactive",'unit':'(%)'},
+      {'cat':"% Physically inactive",'unit':'(%)'},
       {'cat':"% Insufficient sleep (<7 hours)",'unit':'(%)'},
-      {'cat':"% Current Smokers",'unit':'(%)'}]);
+      {'cat':"% Current smokers",'unit':'(%)'}]);
     }
     if (selectedTable.qryName==="Healthcare"){
       return([
@@ -393,7 +393,7 @@ function DataPanel() {
     if (selectedTable.qryName==="Socioeconomic Factors") {
       return([{'cat':"% Graduates high school in 4 years",'unit':'(%)'},
       {'cat':"% In poverty",'unit':'(%)'},
-      {'cat':"Income Inequality",'unit':''},
+      {'cat':"Income inequality",'unit':''},
       {'cat':"Median income ($)",'unit':'$'},
       {'cat':"% Unemployed",'unit':'(%)'}]);
     }
