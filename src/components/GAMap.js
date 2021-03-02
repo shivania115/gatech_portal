@@ -267,6 +267,6 @@ export default function GAMap(props) {
       );
     }
       else {
-        return <Loader active inline='centered' />
+        return <Loader active inline='centered' style={{marginTop: '10rem'}}/>
     }
 }

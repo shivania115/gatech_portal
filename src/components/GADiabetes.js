@@ -9,7 +9,7 @@ import {
   Table,
   Header,
   Divider,
-  List,
+  Loader,
   Menu,
   Dropdown,
   Icon
@@ -77,7 +77,8 @@ function DetTable(props){
       }
     } else {
       val = obj.value;
-    }  
+    }
+    
     return(
     <Table.Row key={index}
               onClick={()=>{
@@ -92,7 +93,6 @@ function DetTable(props){
       <Table.Cell style={{fontSize: '0.9em',verticalAlign:"middle",textAlign:"center", paddingLeft:'0.2em',paddingRight:'0.2em'}}>{numberWithCommas(stateAvg[index])}</Table.Cell>            
     </Table.Row>);
   });
-
 
     return (
     <Table.Body>{zipped}</Table.Body>
@@ -233,6 +233,7 @@ function MenuButton() {
   console.log("cat ", categories)
   // useEffect(()=>{},[]);
 
+  if(fetchedData.length>10){
   return(
     <Grid.Column>  
       <Menu vertical tabular style={{width:'96%', fontSize:'0.9rem', verticalAlign: "middle"}}>
@@ -294,15 +295,17 @@ function MenuButton() {
         <Dropdown.Menu>{item}</Dropdown.Menu>
         </Dropdown>
 
-  </Menu>
+    </Menu>
     </Grid.Column>
-  )
+  )}
+    else {
+      return <Loader active inline='centered' style={{marginTop: '5rem'}}/>
+  } 
 }
 
 function MenuPanel() {
   const {fetchedData} = useGADM()
   
-  if(fetchedData){
   return (
   <Grid>
   <Grid.Row>
@@ -312,7 +315,7 @@ function MenuPanel() {
     <MenuButton/>
   </Grid.Row>
   </Grid>
-  )}
+  )
 }
 
 function DataPanel() {
@@ -405,7 +408,7 @@ function DataPanel() {
     }
   }
 
-  if(fetchedData){
+ 
   return (
     <Grid>
       <Grid.Row>
@@ -423,28 +426,7 @@ function DataPanel() {
           <Grid.Row>
             <Header as='h4' style={{fontWeight: 300, color:'#da291c', paddingLeft:'5em'}}><i><b>Select a category of county characteristics for display</b></i></Header>
           </Grid.Row>
-          {/* <Grid.Row style={{paddingTop: '1.2em', width:'95%'}}>
-            <MenuButton/>
-          </Grid.Row> */}
-        {/* </Grid.Column> */}
-        <Grid.Column style={{paddingTop: '2.4em',paddingLeft:'6rem',textAlign:"center", height:'33rem'}}>
-          {/* <Grid.Row> */}
-          <Header block as='h4' style={{fontWeight: 550, width:'20rem', backgroundColor:'#012169',color:'whitesmoke', verticalAlign:'center',paddingTop:'0.4em',paddingBottom:'0.4em',border:'0',borderRadius:'0.6em 0em 0.6em 0em'}}>
-          {/* style={{fontWeight: 550, color:'#012169',verticalAlign:'center',margin:'0em',paddingTop:'0.4em',paddingBottom:'0.4em',border:'0',borderRadius:'0.6em 0em 0.6em 0em'}}  */}
-            {selectedTable.tableName}
-          </Header>
-          {/* </Grid.Row> */}
-          <Table selectable basic='very' fixed style={{width:'20rem'}}>    
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'50%'}}>Characteristic</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'27%', paddingLeft:'0',paddingRight:'0'}}>County</Table.HeaderCell>
-                <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'25%'}}>State</Table.HeaderCell>                                
-              </Table.Row>
-            </Table.Header>
-            <DetTable categories={RowCat()} />
-          </Table>
-        </Grid.Column>
+        <TablePanel />
       </Grid.Row>
       <Grid.Row>
         <Grid.Column style={{paddingLeft: '5em',fontSize:'0.9rem', textAlign:"left"}}>
@@ -453,8 +435,128 @@ function DataPanel() {
         </Grid.Column>
       </Grid.Row>
     </Grid>
-  );}
+  );
 }
+
+function TablePanel() {
+  // const [desc,setDesc] = useState();
+  // const [source,setSource] = useState();
+
+  const {selectedTable,
+    selectedVariable, 
+    selectedCounty, 
+    fetchedData,
+    actions: {handlePageStateChange}} = useGADM();
+
+  // const {
+  //   isLoggedIn,
+  //   actions: { handleAnonymousLogin },
+  // } = useStitchAuth();
+
+  // const fetchData = async()=> {
+  //   const prom = await gatech.find({},{projection:{"subgroup":1,"subsubgroup":1,"value":1,"county":1,"desc":1,"source":1}}).toArray();
+  //   handlePageStateChange({fetchedData:prom});
+  // }
+
+  // useEffect(()=>{
+  //   if (isLoggedIn === true){
+  //     fetchData();
+  //   } else {
+  //     handleAnonymousLogin();
+  //   }
+  // },[isLoggedIn]);
+
+  // useEffect(()=>{
+  //   var desc = _.map(_.filter(fetchedData,{'subsubgroup':selectedVariable.varName,'county':'Fulton County'}),'desc');
+  //   setDesc(desc);
+  //   var source = _.map(_.filter(fetchedData,{'subsubgroup':selectedVariable.varName,'county':'Fulton County'}),'source');
+  //   setSource(source);
+  // },[selectedVariable,fetchedData]);
+
+
+  const RowCat = () =>{    // determines the printname
+    if (selectedTable.tableName==="Demographic Composition") {
+      return([{'cat':"% 65 years and older", 'unit':'(%)'},
+                                    {'cat':"% Black/African American",'unit':'(%)'},
+                                    {'cat':"% Asian",'unit':'(%)'},
+                                    {'cat':"% Foreign born",'unit':'(%)'},
+                                    {'cat':"% Hispanic",'unit':'(%)'},
+                                    {'cat':"Median age (y)","unit":'(y)'},
+                                    {'cat':"Total Population, thousands", "unit":'(K)'},
+                                    {'cat':"% Women",'unit':'(%)'}]);
+    }
+    if (selectedTable.qryName==="Cardiometabolic disease morbidity") {
+      return([{'cat':"% CHD Prevalence in Medicaid population",'unit':'(%)'},
+      {'cat':"% Diabetes",'unit':'(%)'},
+      {'cat':"% Hypertension in Medicaid population",'unit':'(%)'},
+      {'cat':"Newly diagnosed diabetes (new cases per 1,000)",'unit':'(per K)'},
+      {'cat':"% Obese",'unit':'(%)'}]);
+    }
+    if (selectedTable.qryName==="Clinical events") {
+      return([{'cat':"CVD deaths per 100,000",'unit':'(per M)'},
+      {'cat':"CVD hospitalizations per 100,000",'unit':'(per M)'},
+      {'cat':"Diabetes deaths per 100,000",'unit':'(per M)'},
+      {'cat':"Diabetes hospitalizations per 100,000",'unit':'(per M)'},
+      {'cat':"Kidney hospitalizations per 100,000",'unit':'(per M)'}]);
+    }
+    if (selectedTable.qryName==="Lifestyle Related Risk Factors"){
+      return([{'cat':"% Excessive drinkers",'unit':'(%)'},
+      {'cat':"% Physically inactive",'unit':'(%)'},
+      {'cat':"% Insufficient sleep (<7 hours)",'unit':'(%)'},
+      {'cat':"% Current smokers",'unit':'(%)'}]);
+    }
+    if (selectedTable.qryName==="Healthcare"){
+      return([
+        // "% Diabetes Screening",
+        {'cat':"Cardiologists",'unit':''},
+        {'cat':"Endocrinologists",'unit':''},
+        {'cat':"Primary care doctors (ratio of population to primary care physicians)",'unit':''},
+        {'cat':"% Uninsured",'unit':'(%)'}]);
+    }
+    if (selectedTable.qryName==="Socioeconomic Factors") {
+      return([{'cat':"% Graduates high school in 4 years",'unit':'(%)'},
+      {'cat':"% In poverty",'unit':'(%)'},
+      {'cat':"Income inequality",'unit':''},
+      {'cat':"Median income ($)",'unit':'$'},
+      {'cat':"% Unemployed",'unit':'(%)'}]);
+    }
+    if (selectedTable.qryName==="Environmental Factors") {
+      return([{'cat':"% Exercise opportunities",'unit':'(%)'},
+      {'cat':"Food environment index",'unit':''},
+      {'cat':"Residential segregation score",'unit':''},
+      {'cat':"% Severe housing problems",'unit':'(%)'}]);
+    }
+  }
+
+ 
+    if(fetchedData.length>10){
+      return( 
+        <Grid.Column style={{paddingTop: '2.4em',paddingLeft:'6rem',textAlign:"center", height:'33rem'}}>
+          {/* <Grid.Row> */}
+          <Header block as='h4' style={{fontWeight: 550, width:'20rem', backgroundColor:'#012169',color:'whitesmoke', verticalAlign:'center',paddingTop:'0.4em',paddingBottom:'0.4em',border:'0',borderRadius:'0.6em 0em 0.6em 0em'}}>
+          {/* style={{fontWeight: 550, color:'#012169',verticalAlign:'center',margin:'0em',paddingTop:'0.4em',paddingBottom:'0.4em',border:'0',borderRadius:'0.6em 0em 0.6em 0em'}}  */}
+            {selectedTable.tableName}
+          </Header>
+          {/* </Grid.Row> */}
+          
+            <Table selectable basic='very' fixed style={{width:'20rem'}}>    
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'50%'}}>Characteristic</Table.HeaderCell>
+                  <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'27%', paddingLeft:'0',paddingRight:'0'}}>County</Table.HeaderCell>
+                  <Table.HeaderCell style={{borderTop: 0, fontWeight:500,textAlign:"center", width:'25%'}}>State</Table.HeaderCell>                                
+                </Table.Row>
+              </Table.Header>
+              <DetTable categories={RowCat()} />
+            </Table>
+        </Grid.Column>)
+        }else{
+          return (
+            <Grid.Column style={{height:'33rem'}}>
+              <Loader active inline='centered' style={{marginTop:'11rem'}}/>
+            </Grid.Column>)
+        }
+    }
 
 function MapPanel() {
   const {selectedVariable, 
