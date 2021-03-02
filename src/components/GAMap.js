@@ -10,6 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import _ from 'lodash';
+import {Loader} from 'semantic-ui-react'
 
 const geoUrl ="https://raw.githubusercontent.com/deldersveld/topojson/master/countries/us-states/GA-13-georgia-counties.json"
 
@@ -205,8 +206,8 @@ export default function GAMap(props) {
         x = x.replace(pattern, "$1,$2");
     return x;
   } 
-
-  if (fetchedData) {
+  console.log("fetch", fetchedData)
+  if (fetchedData.length>10) {
     return (
       <div>  
         <div>
@@ -264,5 +265,8 @@ export default function GAMap(props) {
         </Tooltip>
       </div>
       );
-  }
+    }
+      else {
+        return <Loader active inline='centered' />
+    }
 }
