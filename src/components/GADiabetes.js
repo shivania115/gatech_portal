@@ -21,8 +21,9 @@ import styled from 'styled-components';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import ComposableMap from "./ComposableMap";
 import { useForkRef } from "@material-ui/core";
+import { Pane } from "react-leaflet";
 
-
+// table in DataPanel
 function DetTable(props){
   const categories = _.map(props.categories,'cat');
   const unit = _.map(props.categories,'unit');
@@ -303,6 +304,7 @@ function MenuButton() {
   } 
 }
 
+// leftside menu
 function MenuPanel() {
   const {fetchedData} = useGADM()
   
@@ -318,6 +320,8 @@ function MenuPanel() {
   )
 }
 
+
+// rightside data panel
 function DataPanel() {
   const [desc,setDesc] = useState();
   const [source,setSource] = useState();
@@ -649,6 +653,7 @@ export default function GADiabetes() {
               <DataPanel />
             </Grid.Column>
           </Grid.Row>
+          {/* hide content if window is too small */}
           <Grid.Row style={{ display: Warning ? "block" : "none", textAlign:"left", color:"red", paddingTop:'4em',paddingLeft:'2em'}}>
             <Grid.Column>
               <Alert severity="error">
